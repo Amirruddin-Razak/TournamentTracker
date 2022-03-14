@@ -44,7 +44,7 @@ namespace TrackerUI
             this.dashboardHeaderLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(153)))), ((int)(((byte)(255)))));
             this.dashboardHeaderLabel.Location = new System.Drawing.Point(149, 9);
             this.dashboardHeaderLabel.Name = "dashboardHeaderLabel";
-            this.dashboardHeaderLabel.Size = new System.Drawing.Size(309, 47);
+            this.dashboardHeaderLabel.Size = new System.Drawing.Size(387, 60);
             this.dashboardHeaderLabel.TabIndex = 0;
             this.dashboardHeaderLabel.Text = "Tournament Tracker";
             this.dashboardHeaderLabel.TextAlign = System.Drawing.ContentAlignment.TopCenter;
@@ -52,10 +52,10 @@ namespace TrackerUI
             // tournamentListBox
             // 
             this.tournamentListBox.FormattingEnabled = true;
-            this.tournamentListBox.ItemHeight = 30;
+            this.tournamentListBox.ItemHeight = 36;
             this.tournamentListBox.Location = new System.Drawing.Point(27, 90);
             this.tournamentListBox.Name = "tournamentListBox";
-            this.tournamentListBox.Size = new System.Drawing.Size(248, 244);
+            this.tournamentListBox.Size = new System.Drawing.Size(248, 220);
             this.tournamentListBox.TabIndex = 1;
             // 
             // viewTournamentButton
@@ -63,17 +63,19 @@ namespace TrackerUI
             this.viewTournamentButton.Font = new System.Drawing.Font("Segoe UI", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.viewTournamentButton.Location = new System.Drawing.Point(365, 130);
             this.viewTournamentButton.Name = "viewTournamentButton";
-            this.viewTournamentButton.Size = new System.Drawing.Size(182, 34);
+            this.viewTournamentButton.Size = new System.Drawing.Size(182, 45);
             this.viewTournamentButton.TabIndex = 2;
             this.viewTournamentButton.Text = "View Tournament";
             this.viewTournamentButton.UseVisualStyleBackColor = true;
             // 
             // deleteTournamentButton
             // 
+            this.deleteTournamentButton.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(102)))), ((int)(((byte)(102)))), ((int)(((byte)(102)))));
+            this.deleteTournamentButton.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(242)))), ((int)(((byte)(242)))), ((int)(((byte)(242)))));
             this.deleteTournamentButton.Font = new System.Drawing.Font("Segoe UI", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.deleteTournamentButton.Location = new System.Drawing.Point(365, 217);
             this.deleteTournamentButton.Name = "deleteTournamentButton";
-            this.deleteTournamentButton.Size = new System.Drawing.Size(182, 34);
+            this.deleteTournamentButton.Size = new System.Drawing.Size(182, 45);
             this.deleteTournamentButton.TabIndex = 3;
             this.deleteTournamentButton.Text = "Delete Tournament";
             this.deleteTournamentButton.UseVisualStyleBackColor = true;
@@ -83,14 +85,14 @@ namespace TrackerUI
             this.newTournamentButton.Font = new System.Drawing.Font("Segoe UI", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.newTournamentButton.Location = new System.Drawing.Point(207, 382);
             this.newTournamentButton.Name = "newTournamentButton";
-            this.newTournamentButton.Size = new System.Drawing.Size(182, 34);
+            this.newTournamentButton.Size = new System.Drawing.Size(182, 45);
             this.newTournamentButton.TabIndex = 4;
             this.newTournamentButton.Text = "New Tournament";
             this.newTournamentButton.UseVisualStyleBackColor = true;
             // 
             // DashboardForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 30F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(14F, 36F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(624, 441);

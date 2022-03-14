@@ -8,13 +8,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using TrackerLibrary;
+using TrackerLibrary.DataAccess;
+using TrackerLibrary.Models;
 
 namespace TrackerUI
 {
     public partial class NewTournamentForm : Form
     {
-        List<PrizeModel> prizeList = new List<PrizeModel>();
-
         public NewTournamentForm()
         {
             InitializeComponent();
@@ -30,9 +30,9 @@ namespace TrackerUI
                 PrizeModel prize = new PrizeModel(prizeNameTextBox.Text, prizePlaceNumberTextBox.Text, usePrizeAmount,
                     prizeValueTextBox.Text);
 
-                prizeList.Add(prize);
+                prize = GlobalConfig.connection.CreatePrize(prize);
 
-                prizeListBox.Items.Add($"{prize.PlaceNumber} {prize.PrizeName} {prize.PrizeAmount}");
+                prizeListBox.Items.Add($"Number: {prize.PlaceNumber}, Name: {prize.PrizeName}, Amount: {prize.PrizeAmount}");
 
                 prizeNameTextBox.Clear();
                 prizePlaceNumberTextBox.Clear();

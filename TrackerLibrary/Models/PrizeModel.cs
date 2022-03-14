@@ -4,13 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TrackerLibrary
+namespace TrackerLibrary.Models
 {
     /// <summary>
     /// Track each individual prize for tournament
     /// </summary>
     public class PrizeModel
     {
+        /// <summary>
+        /// Store the prize ID
+        /// </summary>
+        public int Id { get; set; }
+
         /// <summary>
         /// Store the place number to receive the prize
         /// </summary>
