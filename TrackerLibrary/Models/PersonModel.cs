@@ -12,6 +12,11 @@ namespace TrackerLibrary.Models
     public class PersonModel
     {
         /// <summary>
+        /// Store team member id
+        /// </summary>
+        public int Id { get; set; }
+
+        /// <summary>
         /// Store team member first name
         /// </summary>
         public string FirstName { get; set; }
@@ -24,7 +29,7 @@ namespace TrackerLibrary.Models
         /// <summary>
         /// Track team member full name
         /// </summary>
-        public string FullName => $"{LastName} {FirstName}";
+        public string FullName => $"{ FirstName } { LastName }";
 
         /// <summary>
         /// Store team member email address
@@ -36,10 +41,7 @@ namespace TrackerLibrary.Models
         /// </summary>
         public string PhoneNumber { get; set; }
 
-        /// <summary>
-        /// Store team member id
-        /// </summary>
-        public int PersonId { get; set; }
+
 
     }
 }

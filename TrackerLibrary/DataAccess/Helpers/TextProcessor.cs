@@ -24,7 +24,40 @@ namespace TrackerLibrary.DataAccess.Helpers
             }
 
             return File.ReadAllLines(file).ToList();
-        } 
+        }
+
+        public static List<PersonModel> ConvertTextToPersonModel(this List<string> lines) 
+        {
+            List<PersonModel> output = new List<PersonModel>();
+
+            foreach (string line in lines)
+            {
+                string[] cols = line.Split(',');
+
+                PersonModel person = new PersonModel();
+                person.Id = int.Parse(cols[0]);
+                person.FirstName = cols[1];
+                person.LastName = cols[2];
+                person.EmailAddress = cols[3];
+                person.PhoneNumber = cols[4];
+
+                output.Add(person);
+            }
+
+            return output;
+        }
+
+        public static void SaveToPersonFile(this List<PersonModel> models, string fileName)
+        {
+            List<string> lines = new List<string>();
+
+            foreach (PersonModel p in models)
+            {
+                lines.Add($"{ p.Id },{ p.FirstName },{ p.LastName },{ p.EmailAddress },{ p.PhoneNumber }");
+            }
+
+            File.WriteAllLines(fileName.FullFilePath(), lines);
+        }
 
         public static List<PrizeModel> ConvertTextToPrizeModel(this List<string> lines)
         {
@@ -34,14 +67,14 @@ namespace TrackerLibrary.DataAccess.Helpers
             {
                 string[] cols = line.Split(',');
 
-                PrizeModel p = new PrizeModel();
-                p.Id = int.Parse(cols[0]);
-                p.PlaceNumber = int.Parse(cols[1]);
-                p.PrizeName = (cols[2]);
-                p.PrizeAmount = decimal.Parse(cols[3]);
-                p.PrizePercentage = float.Parse(cols[4]);
+                PrizeModel prize = new PrizeModel();
+                prize.Id = int.Parse(cols[0]);
+                prize.PlaceNumber = int.Parse(cols[1]);
+                prize.PrizeName = (cols[2]);
+                prize.PrizeAmount = decimal.Parse(cols[3]);
+                prize.PrizePercentage = float.Parse(cols[4]);
 
-                output.Add(p);
+                output.Add(prize);
             }
 
             return output;

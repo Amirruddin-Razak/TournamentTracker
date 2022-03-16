@@ -113,6 +113,7 @@ namespace TrackerUI
             this.addMemberButton.TabIndex = 5;
             this.addMemberButton.Text = "Add Member";
             this.addMemberButton.UseVisualStyleBackColor = true;
+            this.addMemberButton.Click += new System.EventHandler(this.AddMemberButton_Click);
             // 
             // firstNameTextBox
             // 
@@ -199,6 +200,7 @@ namespace TrackerUI
             this.createMemberButton.TabIndex = 14;
             this.createMemberButton.Text = "Create Member";
             this.createMemberButton.UseVisualStyleBackColor = true;
+            this.createMemberButton.Click += new System.EventHandler(this.CreateMemberButton_Click);
             // 
             // createTeamButton
             // 
@@ -213,6 +215,7 @@ namespace TrackerUI
             this.createTeamButton.TabIndex = 15;
             this.createTeamButton.Text = "Create Team";
             this.createTeamButton.UseVisualStyleBackColor = true;
+            this.createTeamButton.Click += new System.EventHandler(this.CreateTeamButton_Click);
             // 
             // memberListBox
             // 
@@ -236,6 +239,7 @@ namespace TrackerUI
             this.removeMemberButton.TabIndex = 17;
             this.removeMemberButton.Text = "Remove Member";
             this.removeMemberButton.UseVisualStyleBackColor = true;
+            this.removeMemberButton.Click += new System.EventHandler(this.RemoveMemberButton_Click);
             // 
             // addNewMemberGroupBox
             // 

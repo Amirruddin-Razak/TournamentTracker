@@ -11,7 +11,27 @@ namespace TrackerLibrary.DataAccess
 {
     public class TextConnector : IDataConnection
     {
-        private const string PrizesFileName = "PrizeModels.csv";
+        private const string PersonFileName = "PersonModels.csv";
+        private const string PrizeFileName = "PrizeModels.csv";
+
+
+        public PersonModel CreatePerson(PersonModel person)
+        {
+            List<PersonModel> people = PersonFileName.FullFilePath().LoadFile().ConvertTextToPersonModel();
+
+            int currentId = 1;
+            if (people.Count > 0)
+            {
+                currentId = people.OrderByDescending(x => x.Id).First().Id + 1;
+            }
+
+            person.Id = currentId;
+            people.Add(person);
+
+            people.SaveToPersonFile(PersonFileName);
+
+            return person;
+        }
 
         /// <summary>
         /// Save new prize to text
@@ -20,10 +40,10 @@ namespace TrackerLibrary.DataAccess
         /// <returns></returns>
         public PrizeModel CreatePrize(PrizeModel model)
         {
-            List<PrizeModel> prizes = PrizesFileName.FullFilePath().LoadFile().ConvertTextToPrizeModel();
+            List<PrizeModel> prizes = PrizeFileName.FullFilePath().LoadFile().ConvertTextToPrizeModel();
 
             int currentId = 1;
-            if (prizes.Count != 0)
+            if (prizes.Count > 0)
             {
                 currentId = prizes.OrderByDescending(x => x.Id).First().Id + 1;
             }
@@ -31,9 +51,14 @@ namespace TrackerLibrary.DataAccess
             model.Id = currentId;
             prizes.Add(model);
 
-            prizes.SaveToPrizeFile(PrizesFileName);
+            prizes.SaveToPrizeFile(PrizeFileName);
 
             return model;
+        }
+
+        public List<PersonModel> GetPerson_All()
+        {
+            return PersonFileName.FullFilePath().LoadFile().ConvertTextToPersonModel();
         }
     }
 }
