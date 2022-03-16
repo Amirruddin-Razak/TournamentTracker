@@ -5,29 +5,21 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Data.SqlClient;
 using TrackerLibrary.Models;
 
 namespace TrackerLibrary.DataAccess
 {
     public class SqlConnector : IDataConnection
     {
-     //   @PlaceNumber INT,
-     //   @PrizeName NVARCHAR(20),
-	    //@PrizeAmount MONEY,
-     //   @PrizePercentage FLOAT,
-	    //@Id INT = 0 OUTPUT
-
-
         /// <summary>
         /// Save new prize to SQL Database
         /// </summary>
         /// <param name="prize"></param>
         /// <returns></returns>
-        // TODO make SQL connector
         public PrizeModel CreatePrize(PrizeModel prize)
         {
-            // Simulate saving to database and add ID
-            using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(GlobalConfig.GetCnnString("TournamentTracker_DB")))
+            using (IDbConnection connection = new SqlConnection(GlobalConfig.GetCnnString("TournamentTracker_DB")))
             {
                 var p = new DynamicParameters();
 
