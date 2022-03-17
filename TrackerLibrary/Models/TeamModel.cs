@@ -12,9 +12,9 @@ namespace TrackerLibrary.Models
     public class TeamModel
     {
         /// <summary>
-        /// Track each member of the team
+        /// Store the team id
         /// </summary>
-        public List<PersonModel> TeamMembers { get; set; } = new List<PersonModel>();
+        public int Id { get; set; }
 
         /// <summary>
         /// Store the name of the team
@@ -22,9 +22,8 @@ namespace TrackerLibrary.Models
         public string TeamName { get; set; }
 
         /// <summary>
-        /// Store the team id
+        /// Track each member of the team
         /// </summary>
-        public int TeamId { get; set; }
-
+        public List<PersonModel> TeamMembers { get; set; } = new List<PersonModel>();
     }
 }

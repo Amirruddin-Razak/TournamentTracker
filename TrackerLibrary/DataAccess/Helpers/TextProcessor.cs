@@ -91,5 +91,71 @@ namespace TrackerLibrary.DataAccess.Helpers
 
             File.WriteAllLines(fileName.FullFilePath(), lines);
         }
+
+        public static List<TeamModel> ConvertTextToTeamModel(this List<string> lines, string PersonFileName) 
+        {
+            List<TeamModel> output = new List<TeamModel>();
+
+            foreach (string line in lines)
+            {
+                string[] cols = line.Split(',');
+
+                TeamModel team = new TeamModel();
+                team.Id = int.Parse(cols[0]);
+                team.TeamName = cols[1];
+
+                string[] membersId = cols[2].Split('|');
+
+                team.TeamMembers = GetMemberById(membersId, PersonFileName);
+
+                output.Add(team);
+            }
+
+            return output;
+        }
+
+        private static List<PersonModel> GetMemberById(string[] membersId, string PersonFileName)
+        {
+            List<PersonModel> output = new List<PersonModel>();
+            List<PersonModel> people = PersonFileName.FullFilePath().LoadFile().ConvertTextToPersonModel();
+
+            foreach (string id in membersId)
+            {
+                output.Add(people.Find(x => x.Id == int.Parse(id)));
+            }
+
+            return output;
+        }
+
+        public static void SaveToTeamFile(this List<TeamModel> models, string fileName) 
+        {
+            List<string> lines = new List<string>();
+
+            foreach (TeamModel team in models)
+            {
+                lines.Add($"{ team.Id },{ team.TeamName },{ ConvertPersonListToString(team.TeamMembers) }");
+            }
+
+            File.WriteAllLines(fileName.FullFilePath(), lines);
+        }
+
+        private static string ConvertPersonListToString(List<PersonModel> models) 
+        {
+            string output = "";
+
+            if (models.Count == 0)
+            {
+                return output;
+            }
+
+            foreach (PersonModel member in models)
+            {
+                output += $"{ member.Id }|";
+            }
+
+            output = output.Remove(output.Length - 1, 1);
+
+            return output;
+        }
     }
 }

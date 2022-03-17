@@ -190,7 +190,36 @@ namespace TrackerUI
 
         private void CreateTeamButton_Click(object sender, EventArgs e)
         {
+            string errorMessage = "";
+            bool validTeamName = true;
 
+            if (teamNameTextBox.Text == null)
+            {
+                errorMessage += "Please enter a team name";
+                validTeamName = false;
+            }
+            else if (teamNameTextBox.Text.Length > 20)
+            {
+                errorMessage += "Team name cannot be more than 20 characters long";
+                validTeamName = false;
+            }
+
+            if (validTeamName)
+            {
+                TeamModel team = new TeamModel
+                {
+                    TeamName = teamNameTextBox.Text,
+                    TeamMembers = selectedMembers
+                };
+
+                team = GlobalConfig.connection.CreateTeam(team);
+
+                //TO DO close form or reset form 
+            }
+            else
+            {
+                MessageBox.Show(errorMessage, "Error");
+            }
         }
     }
 }
