@@ -14,6 +14,8 @@ namespace TrackerLibrary.DataAccess
         private const string PersonFileName = "PersonModels.csv";
         private const string PrizeFileName = "PrizeModels.csv";
         private const string TeamFileName = "TeamModels.csv";
+        private const string MatchupFileName = "MatchupModels.csv";
+        private const string MatchupEntryFileName = "MatchupEntryModels.csv";
         private const string TournamentFileName = "TournamentModels.csv";
 
         public PersonModel CreatePerson(PersonModel model)
@@ -59,7 +61,7 @@ namespace TrackerLibrary.DataAccess
 
         public TeamModel CreateTeam(TeamModel model)
         {
-            List<TeamModel> teams = TeamFileName.FullFilePath().LoadFile().ConvertTextToTeamModel(PersonFileName);
+            List<TeamModel> teams = TeamFileName.FullFilePath().LoadFile().ConvertTextToTeamModel();
 
             int currentId = 1;
             if (teams.Count > 0)
@@ -77,10 +79,7 @@ namespace TrackerLibrary.DataAccess
 
         public TournamentModel CreateTournament(TournamentModel model)
         {
-            List<TournamentModel> tournaments = TournamentFileName
-                .FullFilePath()
-                .LoadFile()
-                .ConvertTextToTournamentModel(PersonFileName, TeamFileName, PrizeFileName);
+            List<TournamentModel> tournaments = TournamentFileName.FullFilePath().LoadFile().ConvertTextToTournamentModel();
 
             int currentId = 1;
             if (tournaments.Count > 0)
@@ -89,11 +88,60 @@ namespace TrackerLibrary.DataAccess
             }
 
             model.Id = currentId;
+
+            CreateMatchup(model);
+
             tournaments.Add(model);
 
             tournaments.SaveToTournamentFile(TournamentFileName);
 
             return model;
+        }
+
+        private void CreateMatchup(TournamentModel model) 
+        {
+            List<MatchupModel> matchups = MatchupFileName.FullFilePath().LoadFile().ConvertTextToMatchupModel();
+
+            int currentId = 1;
+            if (matchups.Count > 0)
+            {
+                currentId = matchups.OrderByDescending(x => x.Id).First().Id + 1;
+            }
+
+            foreach (List<MatchupModel> round in model.Rounds)
+            {
+                foreach (MatchupModel m in round)
+                {
+                    m.Id = currentId;
+                    currentId += 1;
+
+                    CreateMatchupEntry(m);
+
+                    matchups.Add(m);
+                }
+            }
+
+            matchups.SaveToMatchupFile(MatchupFileName);
+        }
+
+        private void CreateMatchupEntry(MatchupModel model) 
+        {
+            List<MatchupEntryModel> entries = MatchupEntryFileName.FullFilePath().LoadFile().ConvertTextToMatchupEntryModel();
+
+            int currentId = 1;
+            if (entries.Count > 0)
+            {
+                currentId = entries.OrderByDescending(x => x.Id).First().Id + 1;
+            }
+
+            foreach (MatchupEntryModel entry in model.Entries)
+            {
+                entry.Id = currentId;
+                currentId += 1;
+                entries.Add(entry);
+            }
+
+            entries.SaveToMatchupEntryFile(MatchupEntryFileName);
         }
 
         public List<PersonModel> GetPerson_All()
@@ -103,7 +151,7 @@ namespace TrackerLibrary.DataAccess
 
         public List<TeamModel> GetTeam_All()
         {
-            return TeamFileName.FullFilePath().LoadFile().ConvertTextToTeamModel(PersonFileName);
+            return TeamFileName.FullFilePath().LoadFile().ConvertTextToTeamModel();
         }
     }
 }
