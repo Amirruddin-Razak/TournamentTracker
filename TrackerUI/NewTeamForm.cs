@@ -16,16 +16,20 @@ namespace TrackerUI
 {
     public partial class NewTeamForm : Form
     {
-        private List<PersonModel> availableMembers = GlobalConfig.connection.GetPerson_All();
-        private List<PersonModel> selectedMembers = new List<PersonModel>();
+        private ITeamRequestor callingForm;
+        private BindingList<PersonModel> availableMembers = new BindingList<PersonModel>(GlobalConfig.connection.GetPerson_All());
+        private BindingList<PersonModel> selectedMembers = new BindingList<PersonModel>();
 
-        public NewTeamForm()
+        public NewTeamForm(ITeamRequestor caller)
         {
             InitializeComponent();
             //CreateSampleData();
-            UpdateList();
+            WireUpList();
+
+            callingForm = caller;
         }
 
+        //TODO remove this function
         private void CreateSampleData() 
         {
             availableMembers.Add(new PersonModel()
@@ -61,13 +65,11 @@ namespace TrackerUI
             });
         }
 
-        private void UpdateList()
+        private void WireUpList()
         {
-            selectMemberComboBox.DataSource = null;
             selectMemberComboBox.DataSource = availableMembers;
             selectMemberComboBox.DisplayMember = "FullName";
 
-            memberListBox.DataSource = null;
             memberListBox.DataSource = selectedMembers;
             memberListBox.DisplayMember = "FullName";
         }
@@ -80,8 +82,6 @@ namespace TrackerUI
 
                 selectedMembers.Add(member);
                 availableMembers.Remove(member);
-
-                UpdateList();
             }
             else
             {
@@ -106,8 +106,6 @@ namespace TrackerUI
                 person = GlobalConfig.connection.CreatePerson(person);
 
                 selectedMembers.Add(person);
-
-                UpdateList();
 
                 firstNameTextBox.Clear();
                 lastNameTextBox.Clear();
@@ -179,8 +177,6 @@ namespace TrackerUI
 
                 availableMembers.Add(member);
                 selectedMembers.Remove(member);
-
-                UpdateList();
             }
             else
             {
@@ -209,12 +205,13 @@ namespace TrackerUI
                 TeamModel team = new TeamModel
                 {
                     TeamName = teamNameTextBox.Text,
-                    TeamMembers = selectedMembers
+                    TeamMembers = selectedMembers.ToList()
                 };
 
                 team = GlobalConfig.connection.CreateTeam(team);
+                callingForm.NewTeamComplete(team);
 
-                //TO DO close form or reset form 
+                Close();
             }
             else
             {

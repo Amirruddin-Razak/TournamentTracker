@@ -12,6 +12,11 @@ namespace TrackerLibrary.Models
     public class TournamentModel
     {
         /// <summary>
+        /// Track the tournament id
+        /// </summary>
+        public int Id { get; set; }
+
+        /// <summary>
         /// Store the name of the tournament
         /// </summary>
         public string TournamentName { get; set; }
@@ -34,12 +39,7 @@ namespace TrackerLibrary.Models
         /// <summary>
         /// Track all match to be played in this tournament
         /// </summary>
-        public List<List<MatchupModel>> GameMatch { get; set; } = new List<List<MatchupModel>>();
-
-        /// <summary>
-        /// Track the tournament id
-        /// </summary>
-        public int TournamentId { get; set; }
+        public List<List<MatchupModel>> Rounds { get; set; } = new List<List<MatchupModel>>();
 
     }
 }

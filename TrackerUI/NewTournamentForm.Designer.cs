@@ -103,6 +103,7 @@ namespace TrackerUI
             this.entreeFeeTextBox.Name = "entreeFeeTextBox";
             this.entreeFeeTextBox.Size = new System.Drawing.Size(298, 42);
             this.entreeFeeTextBox.TabIndex = 4;
+            this.entreeFeeTextBox.Text = "0";
             // 
             // selectTeamLabel
             // 
@@ -137,6 +138,7 @@ namespace TrackerUI
             this.addTeamButton.TabIndex = 8;
             this.addTeamButton.Text = "Add Team";
             this.addTeamButton.UseVisualStyleBackColor = false;
+            this.addTeamButton.Click += new System.EventHandler(this.AddTeamButton_Click);
             // 
             // createPrizeButton
             // 
@@ -186,6 +188,7 @@ namespace TrackerUI
             this.createTournamentButton.TabIndex = 12;
             this.createTournamentButton.Text = "Create Tournament";
             this.createTournamentButton.UseVisualStyleBackColor = false;
+            this.createTournamentButton.Click += new System.EventHandler(this.CreateTournamentButton_Click);
             // 
             // removeTeamButton
             // 
@@ -201,6 +204,7 @@ namespace TrackerUI
             this.removeTeamButton.TabIndex = 13;
             this.removeTeamButton.Text = "Remove Team";
             this.removeTeamButton.UseVisualStyleBackColor = false;
+            this.removeTeamButton.Click += new System.EventHandler(this.RemoveTeamButton_Click);
             // 
             // deletePrizeButton
             // 
@@ -216,6 +220,7 @@ namespace TrackerUI
             this.deletePrizeButton.TabIndex = 14;
             this.deletePrizeButton.Text = "Delete Prize";
             this.deletePrizeButton.UseVisualStyleBackColor = false;
+            this.deletePrizeButton.Click += new System.EventHandler(this.DeletePrizeButton_Click);
             // 
             // prizePlaceNumberTextBox
             // 
