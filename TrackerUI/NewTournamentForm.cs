@@ -18,10 +18,12 @@ namespace TrackerUI
         private BindingList<TeamModel> availableTeams = new BindingList<TeamModel>(GlobalConfig.connection.GetTeam_All());
         private BindingList<TeamModel> selectedTeams = new BindingList<TeamModel>();
         private BindingList<PrizeModel> selectedPrizes = new BindingList<PrizeModel>();
+        private ITournamentRequestor callingForm;
 
-        public NewTournamentForm()
+        public NewTournamentForm(ITournamentRequestor caller)
         {
             InitializeComponent();
+            callingForm = caller;
 
             WireUpList();
         }
@@ -207,7 +209,10 @@ namespace TrackerUI
                 TournamentLogic.CreateRound(tm);
 
                 GlobalConfig.connection.CreateTournament(tm);
-                
+
+                callingForm.NewTournamentComplete(tm);
+
+                Close();
             }
             else
             {

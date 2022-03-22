@@ -87,131 +87,6 @@ namespace TrackerLibrary.DataAccess.Helpers
             return output;
         }
 
-        private static List<PersonModel> FindPersonById(string idString) 
-        {
-            List<string> peopleText = GlobalConfig.PersonFileName.FullFilePath().LoadFile();
-            List<string> matchedPeople = new List<string>();
-
-            string[] ids = idString.Split('|');
-
-            foreach (string id in ids)
-            {
-                foreach (string line in peopleText)
-                {
-                    string[] cols = line.Split(',');
-
-                    if (cols[0] == id)
-                    {
-                        matchedPeople.Add(line);
-                    }
-                }
-            }
-
-            List<PersonModel> output = matchedPeople.ConvertTextToPersonModel();
-
-            return output.Count == 0 ? null : output;
-        }
-
-        private static List<TeamModel> FindTeamById(string idString)
-        {
-            List<string> teamText = GlobalConfig.TeamFileName.FullFilePath().LoadFile();
-            List<string> matchedTeam = new List<string>();
-
-            string[] ids = idString.Split('|');
-
-            foreach (string id in ids)
-            {
-                foreach (string line in teamText)
-                {
-                    string[] cols = line.Split(',');
-
-                    if (cols[0] == id)
-                    {
-                        matchedTeam.Add(line);
-                    }
-                }
-            }
-
-            List<TeamModel> output = matchedTeam.ConvertTextToTeamModel();
-
-            return output.Count == 0 ? null : output;
-        }
-
-        private static List<PrizeModel> FindPrizeById(string idString)
-        {
-            List<string> prizeText = GlobalConfig.PrizeFileName.FullFilePath().LoadFile();
-            List<string> matchedPrize = new List<string>();
-
-            string[] ids = idString.Split('|');
-
-            foreach (string id in ids)
-            {
-                foreach (string line in prizeText)
-                {
-                    string[] cols = line.Split(',');
-
-                    if (cols[0] == id)
-                    {
-                        matchedPrize.Add(line);
-                    }
-                }
-            }
-
-            List<PrizeModel> output = matchedPrize.ConvertTextToPrizeModel();
-
-            return output.Count == 0 ? null : output;
-        }
-
-        private static List<MatchupModel> FindMatchupById(string idString)
-        {
-            List<string> matchupText = GlobalConfig.MatchupFileName.FullFilePath().LoadFile();
-            List<string> matchedMatchup = new List<string>();
-
-            string[] ids = idString.Split('^');
-
-            foreach (string id in ids)
-            {
-                foreach (string line in matchupText)
-                {
-                    string[] cols = line.Split(',');
-
-                    if (cols[0] == id)
-                    {
-                        matchedMatchup.Add(line);
-                    }
-                }
-            }
-
-            List<MatchupModel> output = matchedMatchup.ConvertTextToMatchupModel();
-
-            return output.Count == 0 ? null : output;
-        }
-
-        private static List<MatchupEntryModel> FindMatchupEntryById(string idString)
-        {
-            List<string> matchupEntryText = GlobalConfig.MatchupEntryFileName.FullFilePath().LoadFile();
-            List<string> matchedMatchupEntry = new List<string>();
-
-            string[] ids = idString.Split('|');
-
-            foreach (string id in ids)
-            {
-                foreach (string line in matchupEntryText)
-                {
-                    string[] cols = line.Split(',');
-
-                    if (cols[0] == id)
-                    {
-                        matchedMatchupEntry.Add(line);
-                    }
-                }
-            }
-
-            List<MatchupEntryModel> output = matchedMatchupEntry.ConvertTextToMatchupEntryModel();
-
-            return output.Count == 0 ? null : output;
-        }
-
         public static List<TournamentModel> ConvertTextToTournamentModel(this List<string> lines)
         {
             List<TournamentModel> output = new List<TournamentModel>();
@@ -496,6 +371,131 @@ namespace TrackerLibrary.DataAccess.Helpers
             output = output.Remove(output.Length - 1, 1);
 
             return output;
+        }
+
+        private static List<PersonModel> FindPersonById(string idString)
+        {
+            List<string> peopleText = GlobalConfig.PersonFileName.FullFilePath().LoadFile();
+            List<string> matchedPeople = new List<string>();
+
+            string[] ids = idString.Split('|');
+
+            foreach (string id in ids)
+            {
+                foreach (string line in peopleText)
+                {
+                    string[] cols = line.Split(',');
+
+                    if (cols[0] == id)
+                    {
+                        matchedPeople.Add(line);
+                    }
+                }
+            }
+
+            List<PersonModel> output = matchedPeople.ConvertTextToPersonModel();
+
+            return output.Count == 0 ? null : output;
+        }
+
+        private static List<TeamModel> FindTeamById(string idString)
+        {
+            List<string> teamText = GlobalConfig.TeamFileName.FullFilePath().LoadFile();
+            List<string> matchedTeam = new List<string>();
+
+            string[] ids = idString.Split('|');
+
+            foreach (string id in ids)
+            {
+                foreach (string line in teamText)
+                {
+                    string[] cols = line.Split(',');
+
+                    if (cols[0] == id)
+                    {
+                        matchedTeam.Add(line);
+                    }
+                }
+            }
+
+            List<TeamModel> output = matchedTeam.ConvertTextToTeamModel();
+
+            return output.Count == 0 ? null : output;
+        }
+
+        private static List<PrizeModel> FindPrizeById(string idString)
+        {
+            List<string> prizeText = GlobalConfig.PrizeFileName.FullFilePath().LoadFile();
+            List<string> matchedPrize = new List<string>();
+
+            string[] ids = idString.Split('|');
+
+            foreach (string id in ids)
+            {
+                foreach (string line in prizeText)
+                {
+                    string[] cols = line.Split(',');
+
+                    if (cols[0] == id)
+                    {
+                        matchedPrize.Add(line);
+                    }
+                }
+            }
+
+            List<PrizeModel> output = matchedPrize.ConvertTextToPrizeModel();
+
+            return output.Count == 0 ? null : output;
+        }
+
+        private static List<MatchupModel> FindMatchupById(string idString)
+        {
+            List<string> matchupText = GlobalConfig.MatchupFileName.FullFilePath().LoadFile();
+            List<string> matchedMatchup = new List<string>();
+
+            string[] ids = idString.Split('^');
+
+            foreach (string id in ids)
+            {
+                foreach (string line in matchupText)
+                {
+                    string[] cols = line.Split(',');
+
+                    if (cols[0] == id)
+                    {
+                        matchedMatchup.Add(line);
+                    }
+                }
+            }
+
+            List<MatchupModel> output = matchedMatchup.ConvertTextToMatchupModel();
+
+            return output.Count == 0 ? null : output;
+        }
+
+        private static List<MatchupEntryModel> FindMatchupEntryById(string idString)
+        {
+            List<string> matchupEntryText = GlobalConfig.MatchupEntryFileName.FullFilePath().LoadFile();
+            List<string> matchedMatchupEntry = new List<string>();
+
+            string[] ids = idString.Split('|');
+
+            foreach (string id in ids)
+            {
+                foreach (string line in matchupEntryText)
+                {
+                    string[] cols = line.Split(',');
+
+                    if (cols[0] == id)
+                    {
+                        matchedMatchupEntry.Add(line);
+                    }
+                }
+            }
+
+            List<MatchupEntryModel> output = matchedMatchupEntry.ConvertTextToMatchupEntryModel();
+
+            return output.Count == 0 ? null : output;
         }
     }
 }

@@ -17,6 +17,11 @@ namespace TrackerLibrary.Models
         public int Id { get; set; }
 
         /// <summary>
+        /// Use by database to lookup the competing team
+        /// </summary>
+        public int TeamId { get; set; }
+
+        /// <summary>
         /// Track team competing in this matchup
         /// </summary>
         public TeamModel TeamCompeting { get; set; }
@@ -25,6 +30,11 @@ namespace TrackerLibrary.Models
         /// Track score of the team competing in the matchup
         /// </summary>
         public double Score { get; set; }
+
+        /// <summary>
+        /// Use by database to lookup the ParentMatchup
+        /// </summary>
+        public int ParentMatchupId { get; set; }
 
         /// <summary>
         /// Track the matchup from previous round that lead to this matchup

@@ -34,7 +34,7 @@ namespace TrackerUI
             this.tournamentListBox = new System.Windows.Forms.ListBox();
             this.viewTournamentButton = new System.Windows.Forms.Button();
             this.deleteTournamentButton = new System.Windows.Forms.Button();
-            this.newTournamentButton = new System.Windows.Forms.Button();
+            this.createTournamentButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // dashboardHeaderLabel
@@ -80,15 +80,16 @@ namespace TrackerUI
             this.deleteTournamentButton.Text = "Delete Tournament";
             this.deleteTournamentButton.UseVisualStyleBackColor = true;
             // 
-            // newTournamentButton
+            // createTournamentButton
             // 
-            this.newTournamentButton.Font = new System.Drawing.Font("Segoe UI", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.newTournamentButton.Location = new System.Drawing.Point(207, 382);
-            this.newTournamentButton.Name = "newTournamentButton";
-            this.newTournamentButton.Size = new System.Drawing.Size(182, 45);
-            this.newTournamentButton.TabIndex = 4;
-            this.newTournamentButton.Text = "New Tournament";
-            this.newTournamentButton.UseVisualStyleBackColor = true;
+            this.createTournamentButton.Font = new System.Drawing.Font("Segoe UI", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.createTournamentButton.Location = new System.Drawing.Point(176, 384);
+            this.createTournamentButton.Name = "createTournamentButton";
+            this.createTournamentButton.Size = new System.Drawing.Size(245, 45);
+            this.createTournamentButton.TabIndex = 4;
+            this.createTournamentButton.Text = "Create Tournament";
+            this.createTournamentButton.UseVisualStyleBackColor = true;
+            this.createTournamentButton.Click += new System.EventHandler(this.createTournamentButton_Click);
             // 
             // DashboardForm
             // 
@@ -96,7 +97,7 @@ namespace TrackerUI
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(624, 441);
-            this.Controls.Add(this.newTournamentButton);
+            this.Controls.Add(this.createTournamentButton);
             this.Controls.Add(this.deleteTournamentButton);
             this.Controls.Add(this.viewTournamentButton);
             this.Controls.Add(this.tournamentListBox);
@@ -117,6 +118,6 @@ namespace TrackerUI
         private System.Windows.Forms.ListBox tournamentListBox;
         private System.Windows.Forms.Button viewTournamentButton;
         private System.Windows.Forms.Button deleteTournamentButton;
-        private System.Windows.Forms.Button newTournamentButton;
+        private System.Windows.Forms.Button createTournamentButton;
     }
 }

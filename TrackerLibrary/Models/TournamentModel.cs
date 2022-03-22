@@ -41,5 +41,10 @@ namespace TrackerLibrary.Models
         /// </summary>
         public List<List<MatchupModel>> Rounds { get; set; } = new List<List<MatchupModel>>();
 
+        /// <summary>
+        /// Track if tournament is active
+        /// </summary>
+        public bool Active { get; set; }
+
     }
 }
