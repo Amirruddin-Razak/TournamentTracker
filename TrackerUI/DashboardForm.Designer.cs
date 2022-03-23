@@ -67,6 +67,7 @@ namespace TrackerUI
             this.viewTournamentButton.TabIndex = 2;
             this.viewTournamentButton.Text = "View Tournament";
             this.viewTournamentButton.UseVisualStyleBackColor = true;
+            this.viewTournamentButton.Click += new System.EventHandler(this.viewTournamentButton_Click);
             // 
             // deleteTournamentButton
             // 

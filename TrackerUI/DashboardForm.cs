@@ -14,7 +14,7 @@ namespace TrackerUI
 {
     public partial class DashboardForm : Form, ITournamentRequestor
     {
-        List<TournamentModel> availableTournament = GlobalConfig.connection.GetTournament_All();
+        private BindingList<TournamentModel> tournament = new BindingList<TournamentModel>(GlobalConfig.connection.GetTournament_All());
 
         public DashboardForm()
         {
@@ -24,7 +24,7 @@ namespace TrackerUI
 
         private void WireUpList() 
         {
-            tournamentListBox.DataSource = availableTournament;
+            tournamentListBox.DataSource = tournament;
             tournamentListBox.DisplayMember = "TournamentName";
         }
 
@@ -36,7 +36,13 @@ namespace TrackerUI
 
         public void NewTournamentComplete(TournamentModel tournament)
         {
-            availableTournament.Add(tournament);
+            this.tournament.Add(tournament);
+        }
+
+        private void viewTournamentButton_Click(object sender, EventArgs e)
+        {
+            TournamentViewerForm frm = new TournamentViewerForm((TournamentModel)tournamentListBox.SelectedItem);
+            frm.Show();
         }
     }
 }

@@ -11,6 +11,7 @@ namespace TrackerLibrary.Models
     /// </summary>
     public class MatchupModel
     {
+
         /// <summary>
         /// Track the Matchup id
         /// </summary>
@@ -20,6 +21,40 @@ namespace TrackerLibrary.Models
         /// List of all individual in current matchup
         /// </summary>
         public List<MatchupEntryModel> Entries { get; set; } = new List<MatchupEntryModel>();
+
+        /// <summary>
+        /// Display competing team name
+        /// </summary>
+        public string DisplayName
+        {
+            get
+            {
+                string output = "";
+
+                foreach (MatchupEntryModel me in Entries)
+                {
+                    if (me.TeamCompeting != null)
+                    {
+                        if (output.Length == 0)
+                        {
+                            output = $"{ me.TeamCompeting.TeamName }";
+                        }
+                        else
+                        {
+                            output += $" vs ";
+                            output += $"{ me.TeamCompeting.TeamName }";
+                        }
+                    }
+                    else
+                    {
+                        output = "Not Determined Yet";
+                        break;
+                    }
+                }
+
+                return output;
+            }
+        }
 
         /// <summary>
         /// Used by database to lookup winner

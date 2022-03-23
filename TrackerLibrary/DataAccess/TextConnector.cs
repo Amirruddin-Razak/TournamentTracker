@@ -121,7 +121,7 @@ namespace TrackerLibrary.DataAccess
                 }
             }
 
-            matchups.SaveToMatchupFile(MatchupFileName);
+            matchups.SaveToMatchupFile(GlobalConfig.MatchupFileName);
         }
 
         private void CreateMatchupEntry(MatchupModel model) 
@@ -157,6 +157,34 @@ namespace TrackerLibrary.DataAccess
         public List<TournamentModel> GetTournament_All()
         {
             return TournamentFileName.FullFilePath().LoadFile().ConvertTextToTournamentModel();
+        }
+
+        public void UpdateMatchup(MatchupModel model)
+        {
+            List<MatchupModel> matchups = GlobalConfig.MatchupFileName.FullFilePath().LoadFile().ConvertTextToMatchupModel();
+
+            int currIndex = matchups.FindIndex(x => x.Id == model.Id);
+            matchups[currIndex] = model;
+
+            UpdateMatchupEntry(model);
+
+            matchups.SaveToMatchupFile(GlobalConfig.MatchupFileName);
+        }
+
+        private void UpdateMatchupEntry(MatchupModel model)
+        {
+            List<MatchupEntryModel> entries = GlobalConfig.MatchupEntryFileName
+                .FullFilePath()
+                .LoadFile()
+                .ConvertTextToMatchupEntryModel();
+
+            foreach (MatchupEntryModel entry in model.Entries)
+            {
+                int currIndex = entries.FindIndex(x => x.Id == entry.Id);
+                entries[currIndex] = entry;
+            }
+
+            entries.SaveToMatchupEntryFile(GlobalConfig.MatchupEntryFileName);
         }
     }
 }

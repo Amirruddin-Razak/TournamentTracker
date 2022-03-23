@@ -161,14 +161,14 @@ namespace TrackerLibrary.DataAccess
             }
         }
 
-        private void SaveMatchupEntry(IDbConnection connection, MatchupModel matchup)
+        private void SaveMatchupEntry(IDbConnection connection, MatchupModel model)
         {
-            foreach (MatchupEntryModel entry in matchup.Entries)
+            foreach (MatchupEntryModel entry in model.Entries)
             {
                 var p = new DynamicParameters();
                 p.Add("@Id", entry.Id, dbType: DbType.Int32, direction: ParameterDirection.Output);
                 p.Add("@TeamId", entry.TeamCompeting?.Id);
-                p.Add("@MatchupId", matchup.Id);
+                p.Add("@MatchupId", model.Id);
                 p.Add("@ParentMatchupId", entry.ParentMatchup?.Id);
 
                 connection.Execute("dbo.spMatchupEntry_Insert", p, commandType: CommandType.StoredProcedure);
@@ -203,17 +203,17 @@ namespace TrackerLibrary.DataAccess
             return output;
         }
 
-        private List<TeamModel> GetTeam_ByTournament(IDbConnection connection, TournamentModel tournament)
+        private List<TeamModel> GetTeam_ByTournament(IDbConnection connection, TournamentModel model)
         {
             var p = new DynamicParameters();
-            p.Add("@TournamentId", tournament.Id);
+            p.Add("@TournamentId", model.Id);
 
-            tournament.TeamList = connection.Query<TeamModel>("dbo.spTeam_GetByTournament", p,
+            model.TeamList = connection.Query<TeamModel>("dbo.spTeam_GetByTournament", p,
                         commandType: CommandType.StoredProcedure).ToList();
 
-            tournament.TeamList = GetTeamMember_ByTeam(connection, tournament.TeamList);
+            model.TeamList = GetTeamMember_ByTeam(connection, model.TeamList);
 
-            return tournament.TeamList;
+            return model.TeamList;
         }
 
         private TeamModel GetTeam_ById(IDbConnection connection, int id)
@@ -234,18 +234,18 @@ namespace TrackerLibrary.DataAccess
             return teams.First();
         }
 
-        private List<TeamModel> GetTeamMember_ByTeam(IDbConnection connection, List<TeamModel> teams)
+        private List<TeamModel> GetTeamMember_ByTeam(IDbConnection connection, List<TeamModel> models)
         {
             List<TeamModel> output = new List<TeamModel>();
 
-            foreach (TeamModel t in teams)
+            foreach (TeamModel team in models)
             {
                 var p = new DynamicParameters();
-                p.Add("@TeamId", t.Id);
+                p.Add("@TeamId", team.Id);
 
-                t.TeamMembers = connection.Query<PersonModel>("dbo.spTeamMember_GetByTeam", p,
+                team.TeamMembers = connection.Query<PersonModel>("dbo.spTeamMember_GetByTeam", p,
                     commandType: CommandType.StoredProcedure).ToList();
-                output.Add(t);
+                output.Add(team);
             }
 
             return output;
@@ -276,9 +276,9 @@ namespace TrackerLibrary.DataAccess
             return output;
         }
 
-        private List<List<MatchupModel>> GetRound_ByTournament(IDbConnection connection, TournamentModel tournament)
+        private List<List<MatchupModel>> GetRound_ByTournament(IDbConnection connection, TournamentModel model)
         {
-            List<MatchupModel> matchupList = GetMatchup_ByTournament(connection, tournament.Id);
+            List<MatchupModel> matchupList = GetMatchup_ByTournament(connection, model.Id);
 
             int numOfRound = 0;
             if (matchupList.Count != 0)
@@ -288,10 +288,10 @@ namespace TrackerLibrary.DataAccess
 
             for (int i = 1; i <= numOfRound; i++)
             {
-                tournament.Rounds.Add(matchupList.FindAll(x => x.MatchupRound == i));
+                model.Rounds.Add(matchupList.FindAll(x => x.MatchupRound == i));
             }
 
-            return tournament.Rounds;
+            return model.Rounds;
         }
 
         private List<MatchupModel> GetMatchup_ByTournament(IDbConnection connection, int id)
@@ -330,6 +330,36 @@ namespace TrackerLibrary.DataAccess
             }
 
             return matchups;
+        }
+
+        public void UpdateMatchup(MatchupModel model)
+        {
+            using (IDbConnection connection = new SqlConnection(GlobalConfig.GetCnnString(DbName)))
+            {
+                var p = new DynamicParameters();
+
+                if (model.Winner != null)
+                {
+                    p.Add("@Id", model.Id);
+                    p.Add("@WinnerId", model.Winner.Id);
+
+                    connection.Execute("dbo.spMatchup_UpdateWinner", p, commandType: CommandType.StoredProcedure);
+                }
+
+                foreach (MatchupEntryModel entry in model.Entries)
+                {
+                    if (entry.TeamCompeting != null)
+                    {
+                        p = new DynamicParameters();
+
+                        p.Add("@Id", entry.Id);
+                        p.Add("@TeamId", entry.TeamCompeting.Id);
+                        p.Add("@Score", entry.Score);
+
+                        connection.Execute("dbo.spMatchupEntry_Update", p, commandType: CommandType.StoredProcedure); 
+                    }
+                }
+            }
         }
     }
 }
