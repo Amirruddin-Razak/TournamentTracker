@@ -1,34 +1,31 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using TrackerLibrary;
 using TrackerLibrary.Models;
+using TrackerUI.Interface;
 
 namespace TrackerUI
 {
     public partial class DashboardForm : Form, ITournamentRequestor
     {
-        private BindingList<TournamentModel> tournament = new BindingList<TournamentModel>(GlobalConfig.connection.GetTournament_All());
+        private BindingList<TournamentModel> tournaments = new BindingList<TournamentModel>();
 
         public DashboardForm()
         {
             InitializeComponent();
-            WireUpList();
+
+            InitializeFormData();
         }
 
-        private void WireUpList() 
+        private void InitializeFormData()
         {
-            tournamentListBox.DataSource = tournament;
+            tournaments = new BindingList<TournamentModel>(GlobalConfig.connection.GetTournament_All());
+            tournamentListBox.DataSource = tournaments;
             tournamentListBox.DisplayMember = "TournamentName";
         }
 
-        private void createTournamentButton_Click(object sender, EventArgs e)
+        private void CreateTournamentButton_Click(object sender, EventArgs e)
         {
             NewTournamentForm frm = new NewTournamentForm(this);
             frm.Show();
@@ -36,13 +33,22 @@ namespace TrackerUI
 
         public void NewTournamentComplete(TournamentModel tournament)
         {
-            this.tournament.Add(tournament);
+            tournaments.Add(tournament);
         }
 
-        private void viewTournamentButton_Click(object sender, EventArgs e)
+        private void ViewTournamentButton_Click(object sender, EventArgs e)
         {
-            TournamentViewerForm frm = new TournamentViewerForm((TournamentModel)tournamentListBox.SelectedItem);
+            TournamentModel tournament = (TournamentModel)tournamentListBox.SelectedItem;
+
+            tournament.OnTournamentComplete += Tournament_OnTournamentComplete;
+
+            TournamentViewerForm frm = new TournamentViewerForm(tournament);
             frm.Show();
+        }
+
+        private void Tournament_OnTournamentComplete(object sender, DateTime e)
+        {
+            InitializeFormData();
         }
     }
 }

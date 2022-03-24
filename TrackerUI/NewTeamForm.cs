@@ -9,8 +9,8 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using TrackerLibrary;
-using TrackerLibrary.DataAccess;
 using TrackerLibrary.Models;
+using TrackerUI.Interface;
 
 namespace TrackerUI
 {
@@ -23,49 +23,13 @@ namespace TrackerUI
         public NewTeamForm(ITeamRequestor caller)
         {
             InitializeComponent();
-            //CreateSampleData();
-            WireUpList();
 
             callingForm = caller;
+
+            InitializeFormData();
         }
 
-        //TODO remove this function
-        private void CreateSampleData() 
-        {
-            availableMembers.Add(new PersonModel()
-            {
-                FirstName = "Amir",
-                LastName = "Din",
-                EmailAddress = "AmDin@Mail.com",
-                PhoneNumber = "120-923431"
-            });
-
-            availableMembers.Add(new PersonModel()
-            {
-                FirstName = "Storm",
-                LastName = "Sue",
-                EmailAddress = "SueStorm@Mail.com",
-                PhoneNumber = "130-316819"
-            });
-
-            selectedMembers.Add(new PersonModel()
-            {
-                FirstName = "Beth",
-                LastName = "Cow",
-                EmailAddress = "CowBeth@Mail.com",
-                PhoneNumber = "101-827530"
-            });
-
-            selectedMembers.Add(new PersonModel()
-            {
-                FirstName = "John",
-                LastName = "Snow",
-                EmailAddress = "SnowJohn@Mail.com",
-                PhoneNumber = "111-820930"
-            });
-        }
-
-        private void WireUpList()
+        private void InitializeFormData()
         {
             selectMemberComboBox.DataSource = availableMembers;
             selectMemberComboBox.DisplayMember = "FullName";
@@ -89,38 +53,50 @@ namespace TrackerUI
             }
         }
 
-        private void CreateMemberButton_Click(object sender, EventArgs e)
+        private void RemoveMemberButton_Click(object sender, EventArgs e)
         {
-            string errorMessage = "";
-
-            if (ValidateNewMember(ref errorMessage))
+            if (memberListBox.SelectedItem != null)
             {
-                PersonModel person = new PersonModel() 
-                { 
-                    FirstName = firstNameTextBox.Text, 
-                    LastName = lastNameTextBox.Text, 
-                    EmailAddress = emailAddressTextBox.Text,
-                    PhoneNumber = phoneNumberTextBox.Text
-                };
+                PersonModel member = (PersonModel)memberListBox.SelectedItem;
 
-                person = GlobalConfig.connection.CreatePerson(person);
-
-                selectedMembers.Add(person);
-
-                firstNameTextBox.Clear();
-                lastNameTextBox.Clear();
-                emailAddressTextBox.Clear();
-                phoneNumberTextBox.Clear();
+                availableMembers.Add(member);
+                selectedMembers.Remove(member);
             }
             else
             {
-                MessageBox.Show(errorMessage, "Error");
+                MessageBox.Show("Please select a member to remove", "Error");
             }
         }
 
-        private bool ValidateNewMember(ref string errorMessage)
+        private void CreateMemberButton_Click(object sender, EventArgs e)
+        {
+            if (ValidateNewMember() == false)
+            {
+                return;
+            }
+
+            PersonModel person = new PersonModel()
+            {
+                FirstName = firstNameTextBox.Text,
+                LastName = lastNameTextBox.Text,
+                EmailAddress = emailAddressTextBox.Text,
+                PhoneNumber = phoneNumberTextBox.Text
+            };
+
+            GlobalConfig.connection.SaveNewPerson(person);
+
+            selectedMembers.Add(person);
+
+            firstNameTextBox.Clear();
+            lastNameTextBox.Clear();
+            emailAddressTextBox.Clear();
+            phoneNumberTextBox.Clear();
+        }
+
+        private bool ValidateNewMember()
         {
             bool output = true;
+            string errorMessage = "";
 
             if (firstNameTextBox.Text == "")
             {
@@ -149,7 +125,7 @@ namespace TrackerUI
                 errorMessage += "Email Address cannot be more than 200 character \n";
                 output = false;
             }
-            else if (!Regex.IsMatch(emailAddressTextBox.Text, @"^(?:[\.A-z0-9!#$%&'*+/=?^_`{|}~-]+@(?:[A-z0-9-])+(?:.)+[a-z0-9])$"))
+            else if (!Regex.IsMatch(emailAddressTextBox.Text, @"^(?:[\.A-z0-9!#$%&'*+/=?^_`{|}~-]+@(?:[A-z0-9-])+(?:.)+[A-z0-9])$"))
             {
                 errorMessage += "Please enter a valid Email Address \n";
                 output = false;
@@ -166,57 +142,55 @@ namespace TrackerUI
                 output = false;
             }
 
+            if (output == false)
+            {
+                MessageBox.Show(errorMessage, "Error");
+            }
+
             return output;
-        }
-
-        private void RemoveMemberButton_Click(object sender, EventArgs e)
-        {
-            if (memberListBox.SelectedItem != null)
-            {
-                PersonModel member = (PersonModel)memberListBox.SelectedItem;
-
-                availableMembers.Add(member);
-                selectedMembers.Remove(member);
-            }
-            else
-            {
-                MessageBox.Show("Please select a member to remove", "Error");
-            }
         }
 
         private void CreateTeamButton_Click(object sender, EventArgs e)
         {
-            string errorMessage = "";
-            bool validTeamName = true;
-
-            if (teamNameTextBox.Text == null)
+            if (ValidateTeam() == false)
             {
-                errorMessage += "Please enter a team name";
-                validTeamName = false;
+                return;
+            }
+
+            TeamModel team = new TeamModel
+            {
+                TeamName = teamNameTextBox.Text,
+                TeamMembers = selectedMembers.ToList()
+            };
+
+            GlobalConfig.connection.SaveNewTeam(team);
+            callingForm.NewTeamComplete(team);
+
+            Close();
+        }
+
+        private bool ValidateTeam()
+        {
+            string errorMessage = "";
+            bool output = true;
+
+            if (teamNameTextBox.Text.Length == 0)
+            {
+                errorMessage += "Please enter a team name \n";
+                output = false;
             }
             else if (teamNameTextBox.Text.Length > 20)
             {
-                errorMessage += "Team name cannot be more than 20 characters long";
-                validTeamName = false;
+                errorMessage += "Team name cannot be more than 20 characters long \n";
+                output = false;
             }
 
-            if (validTeamName)
-            {
-                TeamModel team = new TeamModel
-                {
-                    TeamName = teamNameTextBox.Text,
-                    TeamMembers = selectedMembers.ToList()
-                };
-
-                team = GlobalConfig.connection.CreateTeam(team);
-                callingForm.NewTeamComplete(team);
-
-                Close();
-            }
-            else
+            if (output == false)
             {
                 MessageBox.Show(errorMessage, "Error");
             }
+
+            return output;
         }
     }
 }

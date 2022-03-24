@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using TrackerLibrary;
 
@@ -18,7 +15,7 @@ namespace TrackerUI
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            GlobalConfig.InitiallizeConnection(DatabaseType.Sql);
+            GlobalConfig.InitiallizeConnection(DatabaseType.TextFile);
             Application.Run(new DashboardForm());
         }
     }

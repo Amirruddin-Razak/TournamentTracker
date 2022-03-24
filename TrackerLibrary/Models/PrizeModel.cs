@@ -40,6 +40,7 @@ namespace TrackerLibrary.Models
         {
 
         }
+
         public PrizeModel(string prizeName, string prizePlaceNumber, bool usePrizeAmount, string prizeQuantity)
         {
             PrizeName = prizeName;

@@ -11,7 +11,6 @@ namespace TrackerLibrary.Models
     /// </summary>
     public class MatchupModel
     {
-
         /// <summary>
         /// Track the Matchup id
         /// </summary>

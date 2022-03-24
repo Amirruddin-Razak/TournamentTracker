@@ -40,8 +40,5 @@ namespace TrackerLibrary.Models
         /// Store team member phone number
         /// </summary>
         public string PhoneNumber { get; set; }
-
-
-
     }
 }

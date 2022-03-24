@@ -40,6 +40,5 @@ namespace TrackerLibrary.Models
         /// Track the matchup from previous round that lead to this matchup
         /// </summary>
         public MatchupModel ParentMatchup { get; set; }
-
     }
 }

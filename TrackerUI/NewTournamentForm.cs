@@ -8,8 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using TrackerLibrary;
-using TrackerLibrary.DataAccess;
 using TrackerLibrary.Models;
+using TrackerUI.Interface;
 
 namespace TrackerUI
 {
@@ -25,10 +25,10 @@ namespace TrackerUI
             InitializeComponent();
             callingForm = caller;
 
-            WireUpList();
+            InitializeFormData();
         }
 
-        private void WireUpList()
+        private void InitializeFormData()
         {
             teamComboBox.DataSource = availableTeams;
             teamComboBox.DisplayMember = "TeamName";
@@ -43,26 +43,83 @@ namespace TrackerUI
         private void CreatePrizeButton_Click(object sender, EventArgs e)
         {
             bool usePrizeAmount = prizeAmountRadioButton.Checked;
-            string errorMessage = "";
 
-            if (ValidatePrize(usePrizeAmount, ref errorMessage))
+            if (ValidatePrize(usePrizeAmount) == false)
             {
-                PrizeModel prize = new PrizeModel(prizeNameTextBox.Text, prizePlaceNumberTextBox.Text, usePrizeAmount,
+                return;
+            }
+
+            PrizeModel prize = new PrizeModel(prizeNameTextBox.Text, prizePlaceNumberTextBox.Text, usePrizeAmount,
                     prizeValueTextBox.Text);
 
-                // TODO check prize saving order
-                prize = GlobalConfig.connection.CreatePrize(prize);
+            selectedPrizes.Add(prize);
 
-                selectedPrizes.Add(prize);
+            prizeNameTextBox.Clear();
+            prizePlaceNumberTextBox.Clear();
+            prizeValueTextBox.Text = "0";
+        }
 
-                prizeNameTextBox.Clear();
-                prizePlaceNumberTextBox.Clear();
-                prizeValueTextBox.Text = "0";
+        private bool ValidatePrize(bool usePrizeAmount)
+        {
+            bool output = true;
+            string errorMessage = "";
+
+            if (prizeNameTextBox.Text == "")
+            {
+                errorMessage += "Prize Name must be filled \n";
+                output = false;
+            }
+
+            bool validPlaceNumber = int.TryParse(prizePlaceNumberTextBox.Text, out int prizePlaceNumber);
+
+            if (prizePlaceNumberTextBox.Text == "" || validPlaceNumber == false)
+            {
+                errorMessage += "Prize Place Number must be filled with a numeric value \n";
+                output = false;
+            }
+            else if (prizePlaceNumber < 1)
+            {
+                errorMessage += "Prize Place Number must be greater than 0 \n";
+                output = false;
+            }
+
+            if (usePrizeAmount)
+            {
+                bool validPrizeAmount = decimal.TryParse(prizeValueTextBox.Text, out decimal prizeAmount);
+
+                if (prizeValueTextBox.Text == "" || validPrizeAmount == false)
+                {
+                    errorMessage += "Prize Amount must be numeric value \n";
+                    output = false;
+                }
+                else if (prizeAmount <= 0)
+                {
+                    errorMessage += "Negative or Zero Prize Amount are not allowed \n";
+                    output = false;
+                }
             }
             else
             {
-                MessageBox.Show(errorMessage, "Error", MessageBoxButtons.OK);
+                bool validPrizePercentage = double.TryParse(prizeValueTextBox.Text, out double prizePercentage);
+
+                if (prizeValueTextBox.Text == "" || validPrizePercentage == false)
+                {
+                    errorMessage += "Prize Percentage must be numeric value \n";
+                    output = false;
+                }
+                else if (prizePercentage <= 0 || prizePercentage > 100)
+                {
+                    errorMessage += "Prize Percentage must be more than 0 and up to 100 \n";
+                    output = false;
+                }
             }
+
+            if (output == false)
+            {
+                MessageBox.Show(errorMessage, "Error");
+            }
+
+            return output;
         }
 
         private void PrizeAmountRadioButton_CheckedChanged(object sender, EventArgs e)
@@ -75,70 +132,6 @@ namespace TrackerUI
         {
             prizeValueLabel.Text = "Prize Percentage :";
             prizeValueTextBox.Clear();
-        }
-
-        private bool ValidatePrize(bool usePrizeAmount, ref string errorMessage)
-        {
-            bool output = true;
-
-            if (prizeNameTextBox.Text == "")
-            {
-                errorMessage += "Prize Name must be filled";
-                errorMessage += "\n";
-                output = false;
-            }
-
-            bool validPlaceNumber = int.TryParse(prizePlaceNumberTextBox.Text, out int prizePlaceNumber);
-
-            if (prizePlaceNumberTextBox.Text == "" || validPlaceNumber == false)
-            {
-                errorMessage += "Prize Place Number must be filled with a numeric value";
-                errorMessage += "\n";
-                output = false;
-            }
-            else if (prizePlaceNumber < 1)
-            {
-                errorMessage += "Prize Place Number must be greater than 0";
-                errorMessage += "\n";
-                output = false;
-            }
-
-            if (usePrizeAmount)
-            {
-                bool validPrizeAmount = decimal.TryParse(prizeValueTextBox.Text, out decimal prizeAmount);
-
-                if (prizeValueTextBox.Text == "" || validPrizeAmount == false)
-                {
-                    errorMessage += "Prize Amount must be numeric value";
-                    errorMessage += "\n";
-                    output = false;
-                }
-                else if (prizeAmount <= 0)
-                {
-                    errorMessage += "Negative or Zero Prize Amount are not allowed";
-                    errorMessage += "\n";
-                    output = false;
-                }
-            }
-            else
-            {
-                bool validPrizePercentage = double.TryParse(prizeValueTextBox.Text, out double prizePercentage);
-
-                if (prizeValueTextBox.Text == "" || validPrizePercentage == false)
-                {
-                    errorMessage += "Prize Percentage must be numeric value";
-                    errorMessage += "\n";
-                    output = false;
-                }
-                else if (prizePercentage <= 0 || prizePercentage > 100)
-                {
-                    errorMessage += "Prize Percentage must be more than 0 and up to 100";
-                    errorMessage += "\n";
-                    output = false;
-                }
-            }
-
-            return output;
         }
 
         private void NewTeamLinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -194,42 +187,36 @@ namespace TrackerUI
 
         private void CreateTournamentButton_Click(object sender, EventArgs e)
         {
-            string errorMessage = "";
-
-            if (ValidateTournamemnt(ref errorMessage))
+            if (ValidateTournamemnt() == false)
             {
-                TournamentModel tm = new TournamentModel()
-                {
-                    TournamentName = tournamentNameTextBox.Text,
-                    EntryFee = decimal.Parse(entreeFeeTextBox.Text),
-                    TeamList = selectedTeams.ToList(),
-                    Prizes = selectedPrizes.ToList()
-                };
-
-                TournamentLogic.CreateRound(tm);
-
-                GlobalConfig.connection.CreateTournament(tm);
-
-                callingForm.NewTournamentComplete(tm);
-
-                Close();
+                return;
             }
-            else
+
+            TournamentModel tournament = new TournamentModel()
             {
-                MessageBox.Show(errorMessage, "Error");
-            }
+                TournamentName = tournamentNameTextBox.Text,
+                EntryFee = decimal.Parse(entreeFeeTextBox.Text),
+                TeamList = selectedTeams.ToList(),
+                Prizes = selectedPrizes.ToList()
+            };
+
+            TournamentLogic.CreateNewTournament(tournament);
+
+            callingForm.NewTournamentComplete(tournament);
+
+            Close();
         }
 
-        private bool ValidateTournamemnt(ref string errorMessage)
+        private bool ValidateTournamemnt()
         {
             bool output = true;
+            string errorMessage = "";
 
             if (tournamentNameTextBox.Text.Length < 1 || tournamentNameTextBox.Text.Length > 50)
             {
                 errorMessage += "Tournament Name must be between 1 to 50 character long \n";
                 output = false;
             }
-
 
             bool isValidFee = decimal.TryParse(entreeFeeTextBox.Text, out decimal entreeFee);
 
@@ -246,11 +233,11 @@ namespace TrackerUI
             else
             {
                 decimal totalPrize = 0;
-                decimal totalFees = entreeFee * selectedTeams.Count;
+                decimal totalFees = decimal.Multiply(entreeFee, selectedTeams.Count);
 
                 foreach (PrizeModel p in selectedPrizes)
                 {
-                    totalPrize += (((decimal)p.PrizePercentage / 100) * totalFees) + p.PrizeAmount;
+                    totalPrize = decimal.Add(totalPrize, p.CalculatePrize(totalFees));
                 }
 
                 if (totalPrize > totalFees)
@@ -258,6 +245,11 @@ namespace TrackerUI
                     errorMessage += $"Total prize amount = { totalPrize } exceed the total collected fees by { totalPrize - totalFees } \n";
                     output = false;
                 }
+            }
+
+            if (output == false)
+            {
+                MessageBox.Show(errorMessage, "Error");
             }
 
             return output;

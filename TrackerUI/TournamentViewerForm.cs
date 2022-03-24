@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using TrackerLibrary;
 using TrackerLibrary.Models;
@@ -24,14 +20,26 @@ namespace TrackerUI
 
             tournament = tournamentModel;
 
-            LoadFormData();
-            LoadRound();
-            WireUpList();
+            tournament.OnTournamentComplete += Tournament_OnTournamentComplete;
+
+            InitializeFormData();
         }
 
-        private void LoadFormData() 
+        private void Tournament_OnTournamentComplete(object sender, DateTime e)
+        {
+            Close();
+        }
+
+        private void InitializeFormData() 
         {
             tournamentNameLabel.Text = tournament.TournamentName;
+
+            LoadRound();
+
+            roundDropDown.DataSource = roundNumber;
+
+            matchupListBox.DataSource = round;
+            matchupListBox.DisplayMember = "DisplayName";
         }
 
         private void LoadRound()
@@ -40,14 +48,6 @@ namespace TrackerUI
             {
                 roundNumber.Add(i + 1);
             }
-        }
-
-        private void WireUpList()
-        {
-            roundDropDown.DataSource = roundNumber;
-
-            matchupListBox.DataSource = round;
-            matchupListBox.DisplayMember = "DisplayName";
         }
 
         private void RoundDropDown_SelectedIndexChanged(object sender, EventArgs e)
@@ -76,7 +76,7 @@ namespace TrackerUI
             DisplayMatchupDetail();
         }
 
-        private void DisplayMatchupDetail() 
+        private void DisplayMatchupDetail()
         {
             bool isVisible = matchupListBox.SelectedItem != null;
 
@@ -90,18 +90,7 @@ namespace TrackerUI
             LoadMatchup((MatchupModel)matchupListBox.SelectedItem);
         }
 
-        private void UpcomingMatchOnlyCheckBox_CheckedChanged(object sender, EventArgs e)
-        {
-            LoadMatchupList((int)roundDropDown.SelectedItem);
-        }
-
-        private void MatchupListBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            LoadMatchup((MatchupModel)matchupListBox.SelectedItem);
-            DisplayMatchupDetail();
-        }
-
-        private void LoadMatchup(MatchupModel selectedMatchup) 
+        private void LoadMatchup(MatchupModel selectedMatchup)
         {
             if (selectedMatchup == null)
             {
@@ -142,104 +131,81 @@ namespace TrackerUI
             }
         }
 
+        private void UpcomingMatchOnlyCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (roundDropDown.SelectedItem == null)
+            {
+                return;
+            }
+            LoadMatchupList((int)roundDropDown.SelectedItem);
+        }
+
+        private void MatchupListBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            LoadMatchup((MatchupModel)matchupListBox.SelectedItem);
+            DisplayMatchupDetail();
+        }
+
         private void SaveScoreButton_Click(object sender, EventArgs e)
         {
             MatchupModel selectedMatchup = (MatchupModel)matchupListBox.SelectedItem;
 
-            if (selectedMatchup == null)
+            if (selectedMatchup == null || ValidateScore(selectedMatchup) == false)
             {
                 return;
             }
 
-            string errorMeesage = "";
-
-            if (ValidateScore(ref errorMeesage, selectedMatchup))
+            if (selectedMatchup.Entries.Count == 1)
             {
-                if (selectedMatchup.Entries.Count == 1)
-                {
-                    selectedMatchup.Entries[0].Score = double.Parse(team1ScoreTextBox.Text);
-                    selectedMatchup.Winner = selectedMatchup.Entries[0].TeamCompeting;
-                }
-                else
-                {
-                    selectedMatchup.Entries[0].Score = double.Parse(team1ScoreTextBox.Text);
-                    selectedMatchup.Entries[1].Score = double.Parse(team2ScoreTextBox.Text);
-
-                    if (selectedMatchup.Entries[0].Score > selectedMatchup.Entries[1].Score)
-                    {
-                        selectedMatchup.Winner = selectedMatchup.Entries[0].TeamCompeting;
-                    }
-                    else if(selectedMatchup.Entries[1].Score > selectedMatchup.Entries[0].Score)
-                    {
-                        selectedMatchup.Winner = selectedMatchup.Entries[1].TeamCompeting;
-                    }
-                    else
-                    {
-                        MessageBox.Show("Tie game are not allowed", "Error");
-                    }
-                }
-
-                foreach (List<MatchupModel> r in tournament.Rounds)
-                {
-                    foreach (MatchupModel m in r)
-                    {
-                        foreach (MatchupEntryModel me in m.Entries)
-                        {
-                            if (me.ParentMatchup != null && me.ParentMatchup.Id == selectedMatchup.Id)
-                            {
-                                me.TeamCompeting = selectedMatchup.Winner;
-                                GlobalConfig.connection.UpdateMatchup(m);
-                            }
-                        }
-                    } 
-                }
-
-                GlobalConfig.connection.UpdateMatchup(selectedMatchup);
-
-                LoadMatchupList((int)roundDropDown.SelectedItem);
+                selectedMatchup.Entries[0].Score = double.Parse(team1ScoreTextBox.Text);
             }
             else
             {
-                MessageBox.Show(errorMeesage, "Error");
+                selectedMatchup.Entries[0].Score = double.Parse(team1ScoreTextBox.Text);
+                selectedMatchup.Entries[1].Score = double.Parse(team2ScoreTextBox.Text);
             }
+
+            try
+            {
+                TournamentLogic.UpdateTournamentResult(tournament);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Application encounter the following error : {ex.Message}", "Error");
+            }
+
+            LoadMatchupList((int)roundDropDown.SelectedItem);
         }
 
-        private bool ValidateScore(ref string errorMessage, MatchupModel selectedMatchup)
+        private bool ValidateScore(MatchupModel selectedMatchup)
         {
             bool output = true;
-            bool scoreValid;
+            string errorMessage = "";
 
-            if (selectedMatchup.Entries[0].TeamCompeting == null)
+            if (selectedMatchup.Entries.Any(x => x.TeamCompeting == null))
             {
-                errorMessage += "team 1 need to be determined before a match is played \n";
+                errorMessage += "Both team need to be determined before a score is added \n";
                 output = false;
             }
-            else
+
+            bool ScoreOneValid = double.TryParse(team1ScoreTextBox.Text, out double teamOneScore);
+            bool ScoreTwoValid = double.TryParse(team2ScoreTextBox.Text, out double teamTwoScore);
+
+            if (!ScoreOneValid || !ScoreTwoValid)
             {
-                scoreValid = double.TryParse(team1ScoreTextBox.Text, out _);
-                if (!scoreValid)
-                {
-                    errorMessage += "Please enter a valid score for Team 1 \n";
-                    output = false;
-                }
+                errorMessage += "Please enter a valid score for both Team 1 and Team 2\n";
+                output = false;
             }
 
-            if (selectedMatchup.Entries.Count == 2)
+            if (teamOneScore == teamTwoScore)
             {
-                if (selectedMatchup.Entries[1].TeamCompeting == null)
-                {
-                    errorMessage += "team 2 need to be determined before a match is played \n";
-                    output = false;
-                }
-                else
-                {
-                    scoreValid = double.TryParse(team2ScoreTextBox.Text, out _);
-                    if (!scoreValid)
-                    {
-                        errorMessage += "Please enter a valid score for Team 2 \n";
-                        output = false;
-                    }
-                }
+                errorMessage += "Tie match are not allowed \n";
+                output = false;
+            }
+
+            if (output == false)
+            {
+                MessageBox.Show(errorMessage, "Error");
             }
 
             return output;

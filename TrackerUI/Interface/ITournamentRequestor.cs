@@ -5,10 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using TrackerLibrary.Models;
 
-namespace TrackerUI
+namespace TrackerUI.Interface
 {
-    public interface ITeamRequestor
+    public interface ITournamentRequestor
     {
-        void NewTeamComplete(TeamModel team);
+        void NewTournamentComplete(TournamentModel tournament);
     }
 }

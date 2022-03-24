@@ -11,6 +11,8 @@ namespace TrackerLibrary.Models
     /// </summary>
     public class TournamentModel
     {
+        public event EventHandler<DateTime> OnTournamentComplete;
+
         /// <summary>
         /// Track the tournament id
         /// </summary>
@@ -44,7 +46,11 @@ namespace TrackerLibrary.Models
         /// <summary>
         /// Track if tournament is active
         /// </summary>
-        public bool Active { get; set; }
+        public bool Active { get; set; } = true;
 
+        public void CompleteTournament() 
+        {
+            OnTournamentComplete?.Invoke(this, DateTime.Now);
+        }
     }
 }
