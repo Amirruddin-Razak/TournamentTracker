@@ -3,9 +3,9 @@ using System.ComponentModel;
 using System.Windows.Forms;
 using TrackerLibrary;
 using TrackerLibrary.Models;
-using TrackerUI.Interface;
+using TrackerWinFormUI.Interface;
 
-namespace TrackerUI
+namespace TrackerWinFormUI
 {
     public partial class DashboardForm : Form, ITournamentRequestor
     {
@@ -20,7 +20,7 @@ namespace TrackerUI
 
         private void InitializeFormData()
         {
-            tournaments = new BindingList<TournamentModel>(GlobalConfig.connection.GetTournament_All());
+            tournaments = new BindingList<TournamentModel>(GlobalConfig.connection.GetTournament_All().FindAll(x => x.Active));
             tournamentListBox.DataSource = tournaments;
             tournamentListBox.DisplayMember = "TournamentName";
         }
@@ -29,11 +29,17 @@ namespace TrackerUI
         {
             NewTournamentForm frm = new NewTournamentForm(this);
             frm.Show();
+
+            WindowState = FormWindowState.Minimized;
+            ShowInTaskbar = false;
         }
 
         public void NewTournamentComplete(TournamentModel tournament)
         {
             tournaments.Add(tournament);
+
+            WindowState = FormWindowState.Normal;
+            ShowInTaskbar = true;
         }
 
         private void ViewTournamentButton_Click(object sender, EventArgs e)
@@ -42,8 +48,11 @@ namespace TrackerUI
 
             tournament.OnTournamentComplete += Tournament_OnTournamentComplete;
 
-            TournamentViewerForm frm = new TournamentViewerForm(tournament);
+            TournamentViewerForm frm = new TournamentViewerForm(tournament, this);
             frm.Show();
+
+            WindowState = FormWindowState.Minimized;
+            ShowInTaskbar = false;
         }
 
         private void Tournament_OnTournamentComplete(object sender, DateTime e)

@@ -1,5 +1,5 @@
 ﻿
-namespace TrackerUI
+namespace TrackerWinFormUI
 {
     partial class NewTournamentForm
     {
@@ -159,6 +159,7 @@ namespace TrackerUI
             // teamListBox
             // 
             this.teamListBox.FormattingEnabled = true;
+            this.teamListBox.HorizontalScrollbar = true;
             this.teamListBox.ItemHeight = 36;
             this.teamListBox.Location = new System.Drawing.Point(599, 79);
             this.teamListBox.Name = "teamListBox";
@@ -168,6 +169,7 @@ namespace TrackerUI
             // prizeListBox
             // 
             this.prizeListBox.FormattingEnabled = true;
+            this.prizeListBox.HorizontalScrollbar = true;
             this.prizeListBox.ItemHeight = 36;
             this.prizeListBox.Location = new System.Drawing.Point(599, 363);
             this.prizeListBox.Name = "prizeListBox";

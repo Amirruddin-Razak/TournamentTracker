@@ -1,5 +1,5 @@
 ﻿
-namespace TrackerUI
+namespace TrackerWinFormUI
 {
     partial class DashboardForm
     {
@@ -43,7 +43,7 @@ namespace TrackerUI
             this.dashboardHeaderLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(153)))), ((int)(((byte)(255)))));
             this.dashboardHeaderLabel.Location = new System.Drawing.Point(149, 9);
             this.dashboardHeaderLabel.Name = "dashboardHeaderLabel";
-            this.dashboardHeaderLabel.Size = new System.Drawing.Size(309, 47);
+            this.dashboardHeaderLabel.Size = new System.Drawing.Size(387, 60);
             this.dashboardHeaderLabel.TabIndex = 0;
             this.dashboardHeaderLabel.Text = "Tournament Tracker";
             this.dashboardHeaderLabel.TextAlign = System.Drawing.ContentAlignment.TopCenter;
@@ -51,10 +51,11 @@ namespace TrackerUI
             // tournamentListBox
             // 
             this.tournamentListBox.FormattingEnabled = true;
-            this.tournamentListBox.ItemHeight = 30;
+            this.tournamentListBox.HorizontalScrollbar = true;
+            this.tournamentListBox.ItemHeight = 36;
             this.tournamentListBox.Location = new System.Drawing.Point(27, 90);
             this.tournamentListBox.Name = "tournamentListBox";
-            this.tournamentListBox.Size = new System.Drawing.Size(248, 304);
+            this.tournamentListBox.Size = new System.Drawing.Size(248, 292);
             this.tournamentListBox.TabIndex = 1;
             // 
             // viewTournamentButton
@@ -81,7 +82,7 @@ namespace TrackerUI
             // 
             // DashboardForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 30F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(14F, 36F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(624, 441);

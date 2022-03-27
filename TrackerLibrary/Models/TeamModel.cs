@@ -9,7 +9,7 @@ namespace TrackerLibrary.Models
     /// <summary>
     /// Track each team data
     /// </summary>
-    public class TeamModel
+    public class TeamModel : IDataModel
     {
         /// <summary>
         /// Store the team id

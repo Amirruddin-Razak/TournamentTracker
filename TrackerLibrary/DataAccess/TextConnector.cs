@@ -71,14 +71,14 @@ namespace TrackerLibrary.DataAccess
 
             model.Id = currentId;
 
-            CreateMatchup(model);
+            SaveNewMatchup(model);
 
             tournaments.Add(model);
 
             tournaments.SaveToTournamentFile();
         }
 
-        private void CreateMatchup(TournamentModel model) 
+        private void SaveNewMatchup(TournamentModel model)
         {
             List<MatchupModel> matchups = GlobalConfig.MatchupFileName.FullFilePath().LoadFile().ConvertTextToMatchupModel();
 
@@ -95,7 +95,7 @@ namespace TrackerLibrary.DataAccess
                     m.Id = currentId;
                     currentId += 1;
 
-                    CreateMatchupEntry(m);
+                    SaveNewMatchupEntry(m);
 
                     matchups.Add(m);
                 }
@@ -104,7 +104,7 @@ namespace TrackerLibrary.DataAccess
             matchups.SaveToMatchupFile();
         }
 
-        private void CreateMatchupEntry(MatchupModel model) 
+        private void SaveNewMatchupEntry(MatchupModel model)
         {
             List<MatchupEntryModel> entries = GlobalConfig.MatchupEntryFileName.FullFilePath().LoadFile().ConvertTextToMatchupEntryModel();
 
@@ -139,7 +139,7 @@ namespace TrackerLibrary.DataAccess
             return GlobalConfig.TournamentFileName.FullFilePath().LoadFile().ConvertTextToTournamentModel();
         }
 
-        public void UpdateMatchup(MatchupModel model)
+        public void UpdateMatchupWinner(MatchupModel model)
         {
             List<MatchupModel> matchups = GlobalConfig.MatchupFileName.FullFilePath().LoadFile().ConvertTextToMatchupModel();
 
@@ -167,7 +167,7 @@ namespace TrackerLibrary.DataAccess
             entries.SaveToMatchupEntryFile();
         }
 
-        public void CompleteTournament(TournamentModel model)
+        public void UpdateTournamentComplete(TournamentModel model)
         {
             List<TournamentModel> tournaments = GlobalConfig.TournamentFileName.FullFilePath().LoadFile().ConvertTextToTournamentModel();
 

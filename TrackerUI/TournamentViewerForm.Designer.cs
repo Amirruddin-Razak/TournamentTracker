@@ -1,5 +1,5 @@
 ﻿
-namespace TrackerUI
+namespace TrackerWinFormUI
 {
     partial class TournamentViewerForm
     {
@@ -108,6 +108,7 @@ namespace TrackerUI
             // 
             this.matchupListBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.matchupListBox.FormattingEnabled = true;
+            this.matchupListBox.HorizontalScrollbar = true;
             this.matchupListBox.ItemHeight = 36;
             this.matchupListBox.Location = new System.Drawing.Point(23, 225);
             this.matchupListBox.Name = "matchupListBox";

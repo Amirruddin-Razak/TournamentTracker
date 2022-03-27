@@ -53,7 +53,7 @@ namespace TrackerLibrary
 
             AdvanceWinner(MatchupsToScore, model);
 
-            MatchupsToScore.ForEach(x => GlobalConfig.connection.UpdateMatchup(x));
+            MatchupsToScore.ForEach(x => GlobalConfig.connection.UpdateMatchupWinner(x));
 
             int endingRound = model.CheckCurrentRound();
 
@@ -133,7 +133,7 @@ namespace TrackerLibrary
 
         private static void CompleteTournament(TournamentModel model)
         {
-            GlobalConfig.connection.CompleteTournament(model);
+            GlobalConfig.connection.UpdateTournamentComplete(model);
 
             TeamModel winner = model.Rounds.Last().First().Winner;
             TeamModel runnerUp = model.Rounds.Last().First().Entries.Find(x => x.TeamCompeting.Id != winner.Id).TeamCompeting;
@@ -141,12 +141,12 @@ namespace TrackerLibrary
             decimal winnerPrize = 0;
             decimal runnerUpPrize = 0;
 
-            if (model.Prizes.Count > 0)
+            if (model.Prizes?.Count > 0)
             {
                 decimal totalIncome = model.TeamList.Count * model.EntryFee;
 
-                PrizeModel firstPlacePrize = model.Prizes.Find(x => x.PlaceNumber == 1);
-                PrizeModel secondPlacePrize = model.Prizes.Find(x => x.PlaceNumber == 2);
+                PrizeModel firstPlacePrize = model.Prizes?.Find(x => x.PlaceNumber == 1);
+                PrizeModel secondPlacePrize = model.Prizes?.Find(x => x.PlaceNumber == 2);
 
                 if (firstPlacePrize != null)
                 {
@@ -210,7 +210,7 @@ namespace TrackerLibrary
                             if (me.ParentMatchup != null && me.ParentMatchup.Id == m.Id)
                             {
                                 me.TeamCompeting = m.Winner;
-                                GlobalConfig.connection.UpdateMatchup(rm);
+                                GlobalConfig.connection.UpdateMatchupWinner(rm);
                             }
                         }
                     }

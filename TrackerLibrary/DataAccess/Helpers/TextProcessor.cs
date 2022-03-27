@@ -99,21 +99,12 @@ namespace TrackerLibrary.DataAccess.Helpers
                 tournamentModel.Id = int.Parse(cols[0]);
                 tournamentModel.TournamentName = cols[1];
                 tournamentModel.EntryFee = decimal.Parse(cols[2]);
-
                 tournamentModel.TeamList = FindTeamById(cols[3]);
-
                 tournamentModel.Prizes = FindPrizeById(cols[4]);
-
-                string[] round = cols[5].Split('|');
-                tournamentModel.Rounds.AddRange(round.Select(r => FindMatchupById(r)));
-
-                //value 1 for active which evaluate to true
+                tournamentModel.Rounds.AddRange(cols[5].Split('|').Select(r => FindMatchupById(r)));
                 tournamentModel.Active = bool.Parse(cols[6]);
 
-                if (tournamentModel.Active)
-                {
-                    output.Add(tournamentModel);
-                }
+                output.Add(tournamentModel);
             }
 
             return output;
@@ -125,15 +116,12 @@ namespace TrackerLibrary.DataAccess.Helpers
 
             foreach (string line in lines)
             {
-                MatchupModel model = new MatchupModel();
-
                 string[] cols = line.Split(',');
+
+                MatchupModel model = new MatchupModel();
                 model.Id = int.Parse(cols[0]);
-
                 model.Entries = FindMatchupEntryById(cols[1]);
-
                 model.Winner = FindTeamById(cols[2])?.First();
-
                 model.MatchupRound = int.Parse(cols[3]);
 
                 output.Add(model);
@@ -148,12 +136,10 @@ namespace TrackerLibrary.DataAccess.Helpers
 
             foreach (string line in lines)
             {
-                MatchupEntryModel model = new MatchupEntryModel();
-
                 string[] cols = line.Split(',');
 
+                MatchupEntryModel model = new MatchupEntryModel();
                 model.Id = int.Parse(cols[0]);
-
                 model.TeamCompeting = FindTeamById(cols[1])?.First();
 
                 if (cols[2] != "")
@@ -199,7 +185,7 @@ namespace TrackerLibrary.DataAccess.Helpers
 
             foreach (TeamModel t in models)
             {
-                lines.Add($"{ t.Id },{ t.TeamName },{ ConvertPersonListToString(t.TeamMembers) }");
+                lines.Add($"{ t.Id },{ t.TeamName },{ ConvertModelListToString(t.TeamMembers, '|') }");
             }
 
             File.WriteAllLines(GlobalConfig.TeamFileName.FullFilePath(), lines);
@@ -211,8 +197,8 @@ namespace TrackerLibrary.DataAccess.Helpers
 
             foreach (TournamentModel tm in models)
             {
-                lines.Add($"{ tm.Id },{ tm.TournamentName },{ tm.EntryFee },{ ConvertTeamListToString(tm.TeamList) }," +
-                    $"{ ConvertPrizeListToString(tm.Prizes) },{ ConvertRoundListToString(tm.Rounds) },{ tm.Active }");
+                lines.Add($"{ tm.Id },{ tm.TournamentName },{ tm.EntryFee },{ ConvertModelListToString(tm.TeamList, '|') }," +
+                    $"{ ConvertModelListToString(tm.Prizes, '|') },{ ConvertRoundToString(tm.Rounds) },{ tm.Active }");
             }
 
             File.WriteAllLines(GlobalConfig.TournamentFileName.FullFilePath(), lines);
@@ -230,7 +216,7 @@ namespace TrackerLibrary.DataAccess.Helpers
                     winnerId = $"{ m.Winner.Id }";
                 }
                 
-                lines.Add($"{ m.Id },{ ConvertEntryListToString(m.Entries) },{ winnerId },{ m.MatchupRound }");
+                lines.Add($"{ m.Id },{ ConvertModelListToString(m.Entries, '|') },{ winnerId },{ m.MatchupRound }");
             }
 
             File.WriteAllLines(GlobalConfig.MatchupFileName.FullFilePath(), lines);
@@ -243,13 +229,12 @@ namespace TrackerLibrary.DataAccess.Helpers
             foreach (MatchupEntryModel entry in models)
             {
                 string teamId = "";
-                string parentId = "";
-
                 if (entry.TeamCompeting != null)
                 {
                     teamId = $"{ entry.TeamCompeting.Id }";
                 }
 
+                string parentId = "";
                 if (entry.ParentMatchup != null)
                 {
                     parentId = $"{ entry.ParentMatchup.Id }";
@@ -261,65 +246,30 @@ namespace TrackerLibrary.DataAccess.Helpers
             File.WriteAllLines(GlobalConfig.MatchupEntryFileName.FullFilePath(), lines);
         }
 
-        private static string ConvertEntryListToString(List<MatchupEntryModel> models) 
+        private static string ConvertRoundToString(List<List<MatchupModel>> round)
         {
+            StringBuilder builder = new StringBuilder();
             string output = "";
 
-            if (models.Count == 0)
+            if (round == null || round.Count == 0)
             {
                 return output;
             }
-
-            foreach (MatchupEntryModel entry in models)
+            
+            foreach (List<MatchupModel> member in round)
             {
-                output += $"{ entry.Id }|";
+                builder.Append(ConvertModelListToString(member, '^'));
+                builder.Append('|');
             }
 
-            output = output.Remove(output.Length - 1, 1);
+            output = builder.Remove(builder.Length - 1, 1).ToString();
 
             return output;
         }
 
-        private static string ConvertPersonListToString(List<PersonModel> models) 
+        private static string ConvertModelListToString<T>(List<T> models, char delimiter) where T : IDataModel
         {
-            string output = "";
-
-            if (models.Count == 0)
-            {
-                return output;
-            }
-
-            foreach (PersonModel member in models)
-            {
-                output += $"{ member.Id }|";
-            }
-
-            output = output.Remove(output.Length - 1, 1);
-
-            return output;
-        }
-
-        private static string ConvertTeamListToString(List<TeamModel> models)
-        {
-            string output = "";
-
-            if (models.Count == 0)
-            {
-                return output;
-            }
-
-            foreach (TeamModel member in models)
-            {
-                output += $"{ member.Id }|";
-            }
-
-            output = output.Remove(output.Length - 1, 1);
-
-            return output;
-        }
-
-        private static string ConvertPrizeListToString(List<PrizeModel> models)
-        {
+            StringBuilder builder = new StringBuilder();
             string output = "";
 
             if (models == null || models.Count == 0)
@@ -327,73 +277,20 @@ namespace TrackerLibrary.DataAccess.Helpers
                 return output;
             }
 
-            foreach (PrizeModel member in models)
+            foreach (T model in models)
             {
-                output += $"{ member.Id }|";
+                builder.Append(model.Id);
+                builder.Append(delimiter);
             }
 
-            output = output.Remove(output.Length - 1, 1);
-
-            return output;
-        }
-
-        private static string ConvertRoundListToString(List<List<MatchupModel>> round)
-        {
-            string output = "";
-
-            if (round.Count == 0)
-            {
-                return output;
-            }
-
-            foreach (List<MatchupModel> member in round)
-            {
-                output += $"{ ConvertMatchupListToString(member) }|";
-            }
-
-            output = output.Remove(output.Length - 1, 1);
-
-            return output;
-        }
-
-        private static string ConvertMatchupListToString(List<MatchupModel> models)
-        {
-            string output = "";
-
-            if (models.Count == 0)
-            {
-                return output;
-            }
-
-            foreach (MatchupModel member in models)
-            {
-                output += $"{ member.Id }^";
-            }
-
-            output = output.Remove(output.Length - 1, 1);
+            output = builder.Remove(builder.Length - 1, 1).ToString();
 
             return output;
         }
 
         private static List<PersonModel> FindPersonById(string idString)
         {
-            List<string> peopleText = GlobalConfig.PersonFileName.FullFilePath().LoadFile();
-            List<string> matchedPeople = new List<string>();
-
-            string[] ids = idString.Split('|');
-
-            foreach (string id in ids)
-            {
-                foreach (string line in peopleText)
-                {
-                    string[] cols = line.Split(',');
-
-                    if (cols[0] == id)
-                    {
-                        matchedPeople.Add(line);
-                    }
-                }
-            }
+            List<string> matchedPeople = FindById(GlobalConfig.PersonFileName.FullFilePath().LoadFile(), idString);
 
             List<PersonModel> output = matchedPeople.ConvertTextToPersonModel();
 
@@ -402,23 +299,7 @@ namespace TrackerLibrary.DataAccess.Helpers
 
         private static List<TeamModel> FindTeamById(string idString)
         {
-            List<string> teamText = GlobalConfig.TeamFileName.FullFilePath().LoadFile();
-            List<string> matchedTeam = new List<string>();
-
-            string[] ids = idString.Split('|');
-
-            foreach (string id in ids)
-            {
-                foreach (string line in teamText)
-                {
-                    string[] cols = line.Split(',');
-
-                    if (cols[0] == id)
-                    {
-                        matchedTeam.Add(line);
-                    }
-                }
-            }
+            List<string> matchedTeam = FindById(GlobalConfig.TeamFileName.FullFilePath().LoadFile(), idString);
 
             List<TeamModel> output = matchedTeam.ConvertTextToTeamModel();
 
@@ -427,23 +308,7 @@ namespace TrackerLibrary.DataAccess.Helpers
 
         private static List<PrizeModel> FindPrizeById(string idString)
         {
-            List<string> prizeText = GlobalConfig.PrizeFileName.FullFilePath().LoadFile();
-            List<string> matchedPrize = new List<string>();
-
-            string[] ids = idString.Split('|');
-
-            foreach (string id in ids)
-            {
-                foreach (string line in prizeText)
-                {
-                    string[] cols = line.Split(',');
-
-                    if (cols[0] == id)
-                    {
-                        matchedPrize.Add(line);
-                    }
-                }
-            }
+            List<string> matchedPrize = FindById(GlobalConfig.PrizeFileName.FullFilePath().LoadFile(), idString);
 
             List<PrizeModel> output = matchedPrize.ConvertTextToPrizeModel();
 
@@ -452,23 +317,7 @@ namespace TrackerLibrary.DataAccess.Helpers
 
         private static List<MatchupModel> FindMatchupById(string idString)
         {
-            List<string> matchupText = GlobalConfig.MatchupFileName.FullFilePath().LoadFile();
-            List<string> matchedMatchup = new List<string>();
-
-            string[] ids = idString.Split('^');
-
-            foreach (string id in ids)
-            {
-                foreach (string line in matchupText)
-                {
-                    string[] cols = line.Split(',');
-
-                    if (cols[0] == id)
-                    {
-                        matchedMatchup.Add(line);
-                    }
-                }
-            }
+            List<string> matchedMatchup = FindById(GlobalConfig.MatchupFileName.FullFilePath().LoadFile(), idString);
 
             List<MatchupModel> output = matchedMatchup.ConvertTextToMatchupModel();
 
@@ -477,27 +326,33 @@ namespace TrackerLibrary.DataAccess.Helpers
 
         private static List<MatchupEntryModel> FindMatchupEntryById(string idString)
         {
-            List<string> matchupEntryText = GlobalConfig.MatchupEntryFileName.FullFilePath().LoadFile();
-            List<string> matchedMatchupEntry = new List<string>();
+            List<string> matchedMatchupEntry = FindById(GlobalConfig.MatchupEntryFileName.FullFilePath().LoadFile(), idString);
 
-            string[] ids = idString.Split('|');
+            List<MatchupEntryModel> output = matchedMatchupEntry.ConvertTextToMatchupEntryModel();
+
+            return output.Count == 0 ? null : output;
+        }
+
+        private static List<string> FindById(List<string> modelsText, string idString)
+        {
+            List<string> output = new List<string>();
+
+            string[] ids = idString.Split(new[] { '|', '^' });
 
             foreach (string id in ids)
             {
-                foreach (string line in matchupEntryText)
+                foreach (string line in modelsText)
                 {
                     string[] cols = line.Split(',');
 
                     if (cols[0] == id)
                     {
-                        matchedMatchupEntry.Add(line);
+                        output.Add(line);
                     }
                 }
             }
 
-            List<MatchupEntryModel> output = matchedMatchupEntry.ConvertTextToMatchupEntryModel();
-
-            return output.Count == 0 ? null : output;
+            return output;
         }
     }
 }

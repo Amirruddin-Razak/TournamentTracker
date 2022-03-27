@@ -9,7 +9,7 @@ namespace TrackerLibrary.Models
     /// <summary>
     /// Track each individual matchup entry
     /// </summary>
-    public class MatchupEntryModel
+    public class MatchupEntryModel : IDataModel
     {
         /// <summary>
         /// Track the Matchup Entry id

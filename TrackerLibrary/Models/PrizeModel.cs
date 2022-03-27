@@ -9,7 +9,7 @@ namespace TrackerLibrary.Models
     /// <summary>
     /// Track each individual prize for tournament
     /// </summary>
-    public class PrizeModel
+    public class PrizeModel : IDataModel
     {
         /// <summary>
         /// Store the prize ID

@@ -9,7 +9,7 @@ namespace TrackerLibrary.Models
     /// <summary>
     /// Track the whole tournament detail
     /// </summary>
-    public class TournamentModel
+    public class TournamentModel : IDataModel
     {
         public event EventHandler<DateTime> OnTournamentComplete;
 

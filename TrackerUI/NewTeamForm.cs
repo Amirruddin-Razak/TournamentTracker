@@ -10,9 +10,9 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using TrackerLibrary;
 using TrackerLibrary.Models;
-using TrackerUI.Interface;
+using TrackerWinFormUI.Interface;
 
-namespace TrackerUI
+namespace TrackerWinFormUI
 {
     public partial class NewTeamForm : Form
     {

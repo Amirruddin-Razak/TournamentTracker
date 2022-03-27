@@ -159,6 +159,8 @@ namespace TrackerLibrary.DataAccess
             }
         }
 
+
+
         public List<PersonModel> GetPerson_All()
         {
             List<PersonModel> output;
@@ -314,7 +316,9 @@ namespace TrackerLibrary.DataAccess
             return matchups;
         }
 
-        public void UpdateMatchup(MatchupModel model)
+
+
+        public void UpdateMatchupWinner(MatchupModel model)
         {
             using (IDbConnection connection = new SqlConnection(GlobalConfig.GetCnnString(DbName)))
             {
@@ -344,7 +348,7 @@ namespace TrackerLibrary.DataAccess
             }
         }
 
-        public void CompleteTournament(TournamentModel model)
+        public void UpdateTournamentComplete(TournamentModel model)
         {
             using (IDbConnection connection = new SqlConnection(GlobalConfig.GetCnnString(DbName)))
             {

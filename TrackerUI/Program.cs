@@ -2,7 +2,7 @@
 using System.Windows.Forms;
 using TrackerLibrary;
 
-namespace TrackerUI
+namespace TrackerWinFormUI
 {
     static class Program
     {

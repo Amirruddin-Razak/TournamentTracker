@@ -1,5 +1,5 @@
 ﻿
-namespace TrackerUI
+namespace TrackerWinFormUI
 {
     partial class NewTeamForm
     {
@@ -220,6 +220,7 @@ namespace TrackerUI
             // memberListBox
             // 
             this.memberListBox.FormattingEnabled = true;
+            this.memberListBox.HorizontalScrollbar = true;
             this.memberListBox.ItemHeight = 36;
             this.memberListBox.Location = new System.Drawing.Point(500, 80);
             this.memberListBox.Name = "memberListBox";
