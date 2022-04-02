@@ -174,7 +174,7 @@ namespace TrackerWinFormUI
             string errorMessage = "";
             bool output = true;
 
-            if (teamNameTextBox.Text.Length == 0)
+            if (string.IsNullOrWhiteSpace(teamNameTextBox.Text))
             {
                 errorMessage += "Please enter a team name \n";
                 output = false;

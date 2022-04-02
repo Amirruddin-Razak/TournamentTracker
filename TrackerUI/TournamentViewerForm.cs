@@ -229,5 +229,11 @@ namespace TrackerWinFormUI
 
             return output;
         }
+
+        private void TournamentViewerForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            _caller.ShowInTaskbar = true;
+            _caller.WindowState = FormWindowState.Normal;
+        }
     }
 }

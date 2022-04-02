@@ -15,7 +15,7 @@ namespace TrackerWinFormUI
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            GlobalConfig.InitiallizeConnection(DatabaseType.TextFile);
+            GlobalConfig.InitiallizeConnection(DatabaseType.Sql);
             Application.Run(new DashboardForm());
         }
     }

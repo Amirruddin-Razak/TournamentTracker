@@ -26,7 +26,7 @@ namespace TrackerLibrary.Models
         /// <summary>
         /// Record the entry fee for each team to join the tournament 
         /// </summary>
-        public decimal EntryFee { get; set; }
+        public decimal EntreeFee { get; set; }
 
         /// <summary>
         /// Track all team that join the tournament

@@ -98,7 +98,7 @@ namespace TrackerLibrary.DataAccess.Helpers
                 TournamentModel tournamentModel = new TournamentModel();
                 tournamentModel.Id = int.Parse(cols[0]);
                 tournamentModel.TournamentName = cols[1];
-                tournamentModel.EntryFee = decimal.Parse(cols[2]);
+                tournamentModel.EntreeFee = decimal.Parse(cols[2]);
                 tournamentModel.TeamList = FindTeamById(cols[3]);
                 tournamentModel.Prizes = FindPrizeById(cols[4]);
                 tournamentModel.Rounds.AddRange(cols[5].Split('|').Select(r => FindMatchupById(r)));
@@ -197,7 +197,7 @@ namespace TrackerLibrary.DataAccess.Helpers
 
             foreach (TournamentModel tm in models)
             {
-                lines.Add($"{ tm.Id },{ tm.TournamentName },{ tm.EntryFee },{ ConvertModelListToString(tm.TeamList, '|') }," +
+                lines.Add($"{ tm.Id },{ tm.TournamentName },{ tm.EntreeFee },{ ConvertModelListToString(tm.TeamList, '|') }," +
                     $"{ ConvertModelListToString(tm.Prizes, '|') },{ ConvertRoundToString(tm.Rounds) },{ tm.Active }");
             }
 

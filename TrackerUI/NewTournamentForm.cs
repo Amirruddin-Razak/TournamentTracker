@@ -195,7 +195,7 @@ namespace TrackerWinFormUI
             TournamentModel tournament = new TournamentModel()
             {
                 TournamentName = tournamentNameTextBox.Text,
-                EntryFee = decimal.Parse(entreeFeeTextBox.Text),
+                EntreeFee = decimal.Parse(entreeFeeTextBox.Text),
                 TeamList = selectedTeams.ToList(),
                 Prizes = selectedPrizes.ToList()
             };
@@ -245,6 +245,12 @@ namespace TrackerWinFormUI
                     errorMessage += $"Total prize amount = { totalPrize } exceed the total collected fees by { totalPrize - totalFees } \n";
                     output = false;
                 }
+            }
+
+            if (selectedTeams.Count < 2)
+            {
+                errorMessage += "A minimum of 2 teams is needed to create a tournament \n";
+                output = false;
             }
 
             if (output == false)

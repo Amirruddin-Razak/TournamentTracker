@@ -143,7 +143,7 @@ namespace TrackerLibrary
 
             if (model.Prizes?.Count > 0)
             {
-                decimal totalIncome = model.TeamList.Count * model.EntryFee;
+                decimal totalIncome = model.TeamList.Count * model.EntreeFee;
 
                 PrizeModel firstPlacePrize = model.Prizes?.Find(x => x.PlaceNumber == 1);
                 PrizeModel secondPlacePrize = model.Prizes?.Find(x => x.PlaceNumber == 2);
@@ -195,7 +195,7 @@ namespace TrackerLibrary
         }
 
         public static decimal CalculatePrize(this PrizeModel prize, decimal totalIncome)
-            => decimal.Add(prize.PrizeAmount, decimal.Multiply(totalIncome, Convert.ToDecimal(prize.PrizePercentage / 100)));
+            => prize.PrizeAmount + (totalIncome * ((decimal)prize.PrizePercentage / 100m));
 
         private static void AdvanceWinner(List<MatchupModel> models, TournamentModel tournament) 
         {
@@ -325,7 +325,7 @@ namespace TrackerLibrary
 
         private static List<TeamModel> RandomizeTeamOrder(List<TeamModel> models)
         {
-            Random rang = new Random();      
+            Random rang = new Random();   
             List<TeamModel> randomizedTeam = new List<TeamModel>();
 
             int[] drawBox = Enumerable.Range(0, models.Count).ToArray();

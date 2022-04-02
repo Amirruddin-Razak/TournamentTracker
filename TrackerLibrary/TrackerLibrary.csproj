@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataAccess\Helpers\TextProcessor.cs" />
+    <Compile Include="DataAccess\Internal\SqlDataAccess.cs" />
     <Compile Include="EmailLogic.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="GlobalConfig.cs" />
@@ -65,5 +66,6 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
