@@ -11,11 +11,11 @@ namespace TrackerLibrary.DataAccess.Internal
 {
     internal class SqlDataAccess
     {
-        private const string DbName = "TournamentTracker_DB";
+        private const string _dbName = "TournamentTracker_DB";
 
         internal void CreateData<T>(string storedProcedure, T parameter)
         {
-            using (IDbConnection connection = new SqlConnection(GlobalConfig.GetCnnString(DbName)))
+            using (IDbConnection connection = new SqlConnection(GlobalConfig.GetCnnString(_dbName)))
             {
                 connection.Execute(storedProcedure, parameter, commandType: CommandType.StoredProcedure);
             }
@@ -24,7 +24,7 @@ namespace TrackerLibrary.DataAccess.Internal
         internal void CreateData<T>(string storedProcedure, T parameter, out int id)
         {
             id = 0;
-            using (IDbConnection connection = new SqlConnection(GlobalConfig.GetCnnString(DbName)))
+            using (IDbConnection connection = new SqlConnection(GlobalConfig.GetCnnString(_dbName)))
             {
                 var p = new DynamicParameters(parameter);
                 p.Add("@Id", id, dbType: DbType.Int32, direction: ParameterDirection.Output);
@@ -37,7 +37,7 @@ namespace TrackerLibrary.DataAccess.Internal
 
         internal List<T> ReadData<T, U>(string storedProcedure, U parameter)
         {
-            using (IDbConnection connection = new SqlConnection(GlobalConfig.GetCnnString(DbName)))
+            using (IDbConnection connection = new SqlConnection(GlobalConfig.GetCnnString(_dbName)))
             {
                 List<T> output = connection.Query<T>(storedProcedure, parameter, commandType: CommandType.StoredProcedure).ToList();
                 return output;
@@ -46,7 +46,7 @@ namespace TrackerLibrary.DataAccess.Internal
 
         internal void UpdateData<T>(string storedProcedure, T parameter)
         {
-            using (IDbConnection connection = new SqlConnection(GlobalConfig.GetCnnString(DbName)))
+            using (IDbConnection connection = new SqlConnection(GlobalConfig.GetCnnString(_dbName)))
             {
                 connection.Execute(storedProcedure, parameter, commandType: CommandType.StoredProcedure);
             }
