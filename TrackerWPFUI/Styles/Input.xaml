@@ -1,0 +1,15 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="Colour.xaml"/>
+    </ResourceDictionary.MergedDictionaries>
+
+    <Style TargetType="TextBox" x:Key="StandardTextBox">
+        <Setter Property="Background" Value="{StaticResource BackgroundLightBrush}"/>
+        <Setter Property="Padding" Value="3 0 0 0"/>
+    </Style>
+    
+    <Style TargetType="ListBox" x:Key="StandardListBox">
+        <Setter Property="Background" Value="{StaticResource BackgroundLightBrush}"/>
+    </Style>
+</ResourceDictionary>
