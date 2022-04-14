@@ -66,9 +66,10 @@
                     <ComboBox MinWidth="200" Margin="0 0 10 0"
                               ItemsSource="{Binding TeamList}"
                               DisplayMemberPath="TeamName"
-                              SelectedItem="{Binding SelectedTeam}"/>
+                              SelectedItem="{Binding TeamToAdd}"/>
 
-                    <Button Content="Add Team" Style="{StaticResource StandardButton}"/>
+                    <Button Content="Add Team" Style="{StaticResource StandardButton}"
+                            Command="{Binding AddTeamCommand}"/>
                 </StackPanel>
             </StackPanel>
         </StackPanel>
@@ -88,16 +89,18 @@
                     <TextBlock Grid.Row="0" Grid.Column="0" Text="Prize Name : "
                                Margin="0 0 0 5" VerticalAlignment="Center"/>
                     <TextBox Grid.Row="0" Grid.Column="1" MinWidth="150"
-                             Margin="0 0 0 5" Style="{StaticResource StandardTextBox}"/>
+                             Margin="0 0 0 5" Text="{Binding PrizeName, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource StandardTextBox}"/>
                     <TextBlock Grid.Row="1" Grid.Column="0" Text="Prize Number : "
                                Margin="0 5 0 0" VerticalAlignment="Center"/>
                     <TextBox Grid.Row="1" Grid.Column="1" MinWidth="150"
-                             Margin="0 5 0 0" Style="{StaticResource StandardTextBox}"/>
+                             Margin="0 5 0 0" Text="{Binding PrizeNumber, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource StandardTextBox}"/>
                 </Grid>
 
                 <StackPanel Orientation="Horizontal" Margin="0 10">
                     <RadioButton x:Name="UseAmount" Content="Set Amount" Margin="0 0 20 0"
-                                 GroupName="PrizeOption" IsChecked="True"/>
+                                 GroupName="PrizeOption" IsChecked="{Binding UsePrizeAmount}"/>
                     <RadioButton x:Name="UsePercentage" Content="Set Percentage"
                                  GroupName="PrizeOption"/>
                 </StackPanel>
@@ -106,9 +109,10 @@
                             Visibility="{Binding IsChecked, 
                                         Converter={StaticResource BooleanToVisibilityConverter}, 
                                         ElementName=UseAmount,
-                                        FallbackValue=Collapsed}">
+                                        FallbackValue=Visible}">
                     <TextBlock Text="Prize Amount      :" VerticalAlignment="Center" Margin="0 0 10 0"/>
-                    <TextBox MinWidth="150" Style="{StaticResource StandardTextBox}"/>
+                    <TextBox MinWidth="150" Style="{StaticResource StandardTextBox}"
+                             Text="{Binding PrizeAmount, UpdateSourceTrigger=PropertyChanged}"/>
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal"
@@ -117,34 +121,48 @@
                                         ElementName=UsePercentage,
                                         FallbackValue=Collapsed}">
                     <TextBlock Text="Prize Percentage :" VerticalAlignment="Center" Margin="0 0 10 0"/>
-                    <TextBox MinWidth="150" Style="{StaticResource StandardTextBox}"/>
+                    <TextBox MinWidth="150" Style="{StaticResource StandardTextBox}"
+                             Text="{Binding PrizePercentage, UpdateSourceTrigger=PropertyChanged}"/>
                 </StackPanel>
 
                 <Button Content="Create Prize" MaxWidth="100" Margin="0 15"
-                        Style="{StaticResource StandardButton}"/>
+                        Style="{StaticResource StandardButton}"
+                        Command="{Binding CreatePrizeCommand}"/>
             </StackPanel>
         </GroupBox>
 
         
         <!-- Column 2 -->
-        <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="2" Margin="10 0 5 10">
-            <ListBox MinHeight="200" MinWidth="200" Style="{StaticResource StandardListBox}"
-                     ItemsSource="{Binding EnteredTeam}"/>
-            <Button Content="Remove Team" MaxWidth="120" Margin="10 40"
-                    Style="{StaticResource StandardButton}"/>
+        <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="2"
+                    Margin="10 0 5 10">
+            <ListBox MinHeight="200" MinWidth="200"
+                     Style="{StaticResource StandardListBox}"
+                     ItemsSource="{Binding EnteredTeam}"
+                     DisplayMemberPath="TeamName"
+                     SelectedItem="{Binding TeamToRemove}"/>
+            <Button Content="Remove Team" MaxWidth="120" Margin="10 0"
+                    Style="{StaticResource StandardButton}"
+                    Command="{Binding RemoveTeamCommand}"/>
         </StackPanel>
 
-        <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.Column="2" Margin="10 10 5 0">
-            <ListBox MinHeight="200" MinWidth="200" Style="{StaticResource StandardListBox}"
-                     ItemsSource="{Binding PrizeList}"/>
-            <Button Content="Delete Prize" MaxWidth="120" Margin="10 40"
-                    Style="{StaticResource StandardButton}"/>
+        <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.Column="2"
+                    Margin="10 10 5 0">
+            <ListBox MinHeight="200" MinWidth="200"
+                     Style="{StaticResource StandardListBox}"
+                     ItemsSource="{Binding PrizeList}"
+                     DisplayMemberPath="PrizeName"
+                     SelectedItem="{Binding PrizeToDelete}"/>
+            <Button Content="Delete Prize" MaxWidth="120" Margin="10 0"
+                    Style="{StaticResource StandardButton}"
+                    Command="{Binding DeletePrizeCommand}"/>
         </StackPanel>
 
 
         <!-- Create Button -->
-        <Button Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Content="Create Tournament"
-                MaxWidth="150" Margin="0 30 0 0" Style="{StaticResource StandardButton}"/>
+        <Button Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2"
+                Content="Create Tournament" MaxWidth="150" Margin="0 30 0 0"
+                Style="{StaticResource StandardButton}"
+                Command="{Binding CreateTournamentCommand}"/>
 
     </Grid>
 </UserControl>

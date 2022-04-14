@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,69 +13,340 @@ namespace TrackerWPFUI.ViewModels
 {
     public class NewTournamentViewModel : ViewModelBase
     {
-        private List<TeamModel> _enteredTeam = new List<TeamModel>();
-        private List<TeamModel> _teamList;
-        private List<PrizeModel> _prizelist;
+        private string _tournamentName;
+        private string _entreefee;
+        private ObservableCollection<TeamModel> _teamList;
+        private ObservableCollection<TeamModel> _enteredTeam = new ObservableCollection<TeamModel>();
+        private ObservableCollection<PrizeModel> _prizelist = new ObservableCollection<PrizeModel>();
+        private TeamModel _teamToAdd;
+        private TeamModel _teamToRemove;
+        private string _prizeName;
+        private string _prizeNumber;
+        private string _prizeAmount = "0";
+        private string _prizePercentage;
+        private bool _usePrizeAmount = true;
+        private PrizeModel _prizeToDelete;
+        private readonly NavigationStore _navigationStore;
+        private readonly DashBoardViewModel _dashBoardViewModel;
+        private RelayCommand _addTeamCommand;
+        private RelayCommand _removeTeamCommand;
+        private RelayCommand _createPrizeCommand;
+        private RelayCommand _deletePrizeCommand;
+        private RelayCommand _createTournamentCommand;
 
-        public NewTournamentViewModel(NavigationStore navigationStore)
+        public NewTournamentViewModel(NavigationStore navigationStore, DashBoardViewModel dashBoardViewModel)
         {
             _navigationStore = navigationStore;
+            _dashBoardViewModel = dashBoardViewModel;
+            TeamList = new ObservableCollection<TeamModel>(GlobalConfig.connection.GetTeam_All());
 
             CreateNewTeamCommand = new RelayCommand(CreateNewTeam);
-
-            TeamList = GlobalConfig.connection.GetTeam_All();
+            AddTeamCommand = new RelayCommand(AddTeam, CanAddTeam);
+            RemoveTeamCommand = new RelayCommand(RemoveTeam, CanRemoveTeam);
+            CreatePrizeCommand = new RelayCommand(CreatePrize, CanCreatePrize);
+            DeletePrizeCommand = new RelayCommand(DeletePrize, CanDeletePrize);
+            CreateTournamentCommand = new RelayCommand(CreateTournament, CanCreateTournament);
         }
+
+
+        public string TournamentName
+        {
+            get => _tournamentName;
+            set { _tournamentName = value; }
+        }
+        public string EntreeFee
+        {
+            get => _entreefee;
+            set { _entreefee = value; }
+        }
+
+        public ObservableCollection<TeamModel> EnteredTeam
+        {
+            get => _enteredTeam;
+            set { _enteredTeam = value; }
+        }
+        public TeamModel TeamToRemove
+        {
+            get => _teamToRemove;
+            set
+            {
+                _teamToRemove = value;
+                _removeTeamCommand.OnCanExecuteChanged(this, EventArgs.Empty);
+            }
+        }
+
+        public ObservableCollection<TeamModel> TeamList
+        {
+            get => _teamList;
+            set { _teamList = value; }
+        }
+        public TeamModel TeamToAdd
+        {
+            get => _teamToAdd;
+            set
+            {
+                _teamToAdd = value;
+                _addTeamCommand.OnCanExecuteChanged(this, EventArgs.Empty);
+            }
+        }
+
+        public ObservableCollection<PrizeModel> PrizeList
+        {
+            get => _prizelist;
+            set { _prizelist = value; }
+        }
+
+
+        public string PrizeName
+        {
+            get => _prizeName;
+            set
+            {
+                _prizeName = value;
+                OnPropertyChanged(nameof(PrizeName));
+                _createPrizeCommand.OnCanExecuteChanged(this, EventArgs.Empty);
+            }
+        }
+        public string PrizeNumber
+        {
+            get => _prizeNumber;
+            set
+            {
+                _prizeNumber = value;
+                OnPropertyChanged(nameof(PrizeNumber));
+                _createPrizeCommand.OnCanExecuteChanged(this, EventArgs.Empty);
+            }
+        }
+        public string PrizeAmount
+        {
+            get => _prizeAmount;
+            set
+            {
+                _prizeAmount = value;
+                OnPropertyChanged(nameof(PrizeAmount));
+                _createPrizeCommand.OnCanExecuteChanged(this, EventArgs.Empty);
+            }
+        }
+        public string PrizePercentage
+        {
+            get => _prizePercentage;
+            set
+            {
+                _prizePercentage = value;
+                OnPropertyChanged(nameof(PrizePercentage));
+                _createPrizeCommand.OnCanExecuteChanged(this, EventArgs.Empty);
+            }
+        }
+        public bool UsePrizeAmount
+        {
+            get => _usePrizeAmount;
+            set
+            {
+                _usePrizeAmount = value;
+                if (_usePrizeAmount)
+                {
+                    PrizeAmount = "0";
+                    PrizePercentage = null;
+                    OnPropertyChanged(nameof(PrizePercentage));
+                }
+                else
+                {
+                    PrizeAmount = null;
+                    PrizePercentage = "0";
+                    OnPropertyChanged(nameof(PrizeAmount));
+                }
+
+                OnPropertyChanged(nameof(UsePrizeAmount));
+            }
+        }
+        public PrizeModel PrizeToDelete
+        {
+            get => _prizeToDelete;
+            set
+            {
+                _prizeToDelete = value;
+                _deletePrizeCommand.OnCanExecuteChanged(this, EventArgs.Empty);
+            }
+        }
+
+
+        public RelayCommand CreateNewTeamCommand { get; set; }
+        public RelayCommand AddTeamCommand
+        {
+            get => _addTeamCommand;
+            set => _addTeamCommand = value;
+        }
+        public RelayCommand RemoveTeamCommand
+        {
+            get => _removeTeamCommand;
+            set => _removeTeamCommand = value;
+        }
+        public RelayCommand CreatePrizeCommand
+        {
+            get => _createPrizeCommand;
+            set { _createPrizeCommand = value; }
+        }
+        public RelayCommand DeletePrizeCommand
+        {
+            get => _deletePrizeCommand;
+            set => _deletePrizeCommand = value;
+        }
+        public RelayCommand CreateTournamentCommand
+        {
+            get => _createTournamentCommand;
+            set => _createTournamentCommand = value;
+        }
+
+
 
         private void CreateNewTeam(object parameter)
         {
             _navigationStore.CurrentViewModel = new NewTeamViewModel(_navigationStore, this);
         }
 
-        public TournamentModel Tournament { get; set; } = new TournamentModel();
+        private bool CanAddTeam(object parameter) => TeamToAdd != null;
 
-        public List<TeamModel> EnteredTeam
+        private void AddTeam(object parameter)
         {
-            get { return _enteredTeam; }
-            set { _enteredTeam = value; }
+            EnteredTeam.Add(TeamToAdd);
+            TeamList.Remove(TeamToAdd);
         }
 
-        public List<TeamModel> TeamList
+        private bool CanRemoveTeam(object parameter) => TeamToRemove != null;
+
+        private void RemoveTeam(object parameter)
         {
-            get { return _teamList; }
-            set { _teamList = value; }
+            TeamList.Add(TeamToRemove);
+            EnteredTeam.Remove(TeamToRemove);
         }
 
-        public List<PrizeModel> PrizeList
+        private bool CanCreatePrize(object parameter)
         {
-            get { return _prizelist; }
-            set { _prizelist = value; }
+            if (string.IsNullOrWhiteSpace(PrizeName))
+            {
+                return false;
+            }
+            
+            if (string.IsNullOrWhiteSpace(PrizeNumber))
+            {
+                return false;
+            }
+
+            if (UsePrizeAmount)
+            {
+                return decimal.TryParse(PrizeAmount, out decimal result) &&
+                    result > 0;
+            }
+            else
+            {
+                return decimal.TryParse(PrizePercentage, out decimal result) &&
+                    result > 0 && result <= 100;
+            }
         }
 
-        private TeamModel _selectedTeam;
-
-        public TeamModel SelectedTeam
+        private void CreatePrize(object parameter)
         {
-            get { return _selectedTeam; }
-            set { _selectedTeam = value; }
+            PrizeModel prize;
+
+            if (UsePrizeAmount)
+            {
+                bool isValidPrize = decimal.TryParse(PrizeAmount, out decimal result) && result > 0;
+                if (!isValidPrize)
+                {
+                    //TODO Display Error
+                    return;
+                }
+            }
+            else
+            {
+                bool isValidPrize = decimal.TryParse(PrizePercentage, out decimal result) && result > 0 && result <= 100;
+                if (!isValidPrize)
+                {
+                    //TODO Display Error
+                    return;
+                }
+            }
+
+            if (UsePrizeAmount)
+            {
+                prize = new PrizeModel(PrizeName, PrizeNumber, UsePrizeAmount, PrizeAmount);
+            }
+            else
+            {
+                prize = new PrizeModel(PrizeName, PrizeNumber, UsePrizeAmount, PrizePercentage);
+            }
+
+            PrizeList.Add(prize);
+
+            PrizeName = null;
+            PrizeNumber = null;
+            UsePrizeAmount = true;
         }
 
-        private string _tournamentName;
+        private bool CanDeletePrize(object parameter) => PrizeToDelete != null;
 
-        public string TournamentName
+        private void DeletePrize(object parameter)
         {
-            get { return _tournamentName; }
-            set { _tournamentName = value; }
+            PrizeList.Remove(PrizeToDelete);
         }
 
-        private decimal _entreefee;
-        private readonly NavigationStore _navigationStore;
-
-        public decimal EntreeFee
+        private bool CanCreateTournament(object arg)
         {
-            get { return _entreefee; }
-            set { _entreefee = value; }
+            if (string.IsNullOrWhiteSpace(TournamentName))
+            {
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(EntreeFee))
+            {
+                EntreeFee = "0";
+            }
+
+            if (TeamList.Count == 0)
+            {
+                return false;
+            }
+
+            return true;
         }
 
-        public RelayCommand CreateNewTeamCommand { get; set; }
+        private void CreateTournament(object obj)
+        {
+            if (!decimal.TryParse(EntreeFee, out decimal entreeFee) || entreeFee < 0)
+            {
+                //TODO display Error
+                return;
+            }
+
+            if (PrizeList.Count > 0)
+            {
+                decimal totalIncome = entreeFee * TeamList.Count;
+
+                decimal totalPrize = 0;
+                foreach (PrizeModel prize in PrizeList)
+                {
+                    totalPrize += prize.CalculatePrize(totalIncome);
+                }
+
+                if (totalPrize > totalIncome)
+                {
+                    //TODO display error
+                    return;
+                }
+            }
+
+            TournamentModel tournament = new TournamentModel()
+            {
+                TournamentName = TournamentName,
+                EntreeFee = entreeFee,
+                Prizes = PrizeList.ToList(),
+                TeamList = TeamList.ToList()
+            };
+
+            TournamentLogic.CreateNewTournament(tournament);
+
+            _dashBoardViewModel.TournamentList.Add(tournament);
+            _navigationStore.CurrentViewModel = _dashBoardViewModel;
+        }
     }
 }

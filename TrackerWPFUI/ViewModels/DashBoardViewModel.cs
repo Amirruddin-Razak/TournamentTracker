@@ -12,7 +12,7 @@ using TrackerWPFUI.ViewModels.Base;
 
 namespace TrackerWPFUI.ViewModels
 {
-    class DashBoardViewModel : ViewModelBase
+    public class DashBoardViewModel : ViewModelBase
     {
         private BindingList<TournamentModel> _tournamentList = new BindingList<TournamentModel>();
         private TournamentModel _selectedTournament;
@@ -53,7 +53,7 @@ namespace TrackerWPFUI.ViewModels
 
         public void CreateTournament(object parameter)
         {
-            _navigationStore.CurrentViewModel = new NewTournamentViewModel(_navigationStore);
+            _navigationStore.CurrentViewModel = new NewTournamentViewModel(_navigationStore, this);
         }
 
         public bool CanViewTournament(object parameter) => SelectedTournament != null;
