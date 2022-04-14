@@ -39,9 +39,11 @@ namespace TrackerWPFUI.ViewModels
             CreatePrizeCommand = new RelayCommand(CreatePrize, CanCreatePrize);
             DeletePrizeCommand = new RelayCommand(DeletePrize, CanDeletePrize);
             CreateTournamentCommand = new RelayCommand(CreateTournament, CanCreateTournament);
+            CancelCommand = new RelayCommand(Cancel);
 
             EnteredTeam.CollectionChanged += EnteredTeam_CollectionChanged;
         }
+
 
         private void EnteredTeam_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
@@ -171,6 +173,7 @@ namespace TrackerWPFUI.ViewModels
         public RelayCommand CreatePrizeCommand { get; set; }
         public RelayCommand DeletePrizeCommand { get; set; }
         public RelayCommand CreateTournamentCommand { get; set; }
+        public RelayCommand CancelCommand { get; set; }
 
 
         private void CreateNewTeam(object parameter)
@@ -264,7 +267,7 @@ namespace TrackerWPFUI.ViewModels
             PrizeList.Remove(PrizeToDelete);
         }
 
-        private bool CanCreateTournament(object arg)
+        private bool CanCreateTournament(object parameter)
         {
             if (string.IsNullOrWhiteSpace(TournamentName))
             {
@@ -284,7 +287,7 @@ namespace TrackerWPFUI.ViewModels
             return true;
         }
 
-        private void CreateTournament(object obj)
+        private void CreateTournament(object parameter)
         {
             if (!decimal.TryParse(EntreeFee, out decimal entreeFee) || entreeFee < 0)
             {
@@ -320,6 +323,11 @@ namespace TrackerWPFUI.ViewModels
             TournamentLogic.CreateNewTournament(tournament);
 
             _dashBoardViewModel.TournamentList.Add(tournament);
+            _navigationStore.CurrentViewModel = _dashBoardViewModel;
+        }
+
+        private void Cancel(object parameter)
+        {
             _navigationStore.CurrentViewModel = _dashBoardViewModel;
         }
     }

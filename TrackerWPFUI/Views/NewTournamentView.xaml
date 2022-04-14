@@ -125,7 +125,7 @@
                              Text="{Binding PrizePercentage, UpdateSourceTrigger=PropertyChanged}"/>
                 </StackPanel>
 
-                <Button Content="Create Prize" MaxWidth="100" Margin="0 15"
+                <Button Content="Create Prize" MaxWidth="160" Margin="0 15"
                         Style="{StaticResource StandardButton}"
                         Command="{Binding CreatePrizeCommand}"/>
             </StackPanel>
@@ -140,7 +140,7 @@
                      ItemsSource="{Binding EnteredTeam}"
                      DisplayMemberPath="TeamName"
                      SelectedItem="{Binding TeamToRemove}"/>
-            <Button Content="Remove Team" MaxWidth="120" Margin="10 0"
+            <Button Content="Remove Team" MaxWidth="160" Margin="10 0"
                     Style="{StaticResource StandardButton}"
                     Command="{Binding RemoveTeamCommand}"/>
         </StackPanel>
@@ -152,17 +152,23 @@
                      ItemsSource="{Binding PrizeList}"
                      DisplayMemberPath="PrizeName"
                      SelectedItem="{Binding PrizeToDelete}"/>
-            <Button Content="Delete Prize" MaxWidth="120" Margin="10 0"
+            <Button Content="Delete Prize" MaxWidth="160" Margin="10 0"
                     Style="{StaticResource StandardButton}"
                     Command="{Binding DeletePrizeCommand}"/>
         </StackPanel>
 
 
-        <!-- Create Button -->
-        <Button Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2"
-                Content="Create Tournament" MaxWidth="150" Margin="0 30 0 0"
-                Style="{StaticResource StandardButton}"
-                Command="{Binding CreateTournamentCommand}"/>
-
+        <!-- Row 3 -->
+        <StackPanel Orientation="Horizontal" Grid.Row="3" Grid.Column="1"
+                    Grid.ColumnSpan="2" HorizontalAlignment="Center"
+                    Margin="0 45">
+            <Button Content="Cancel" MinWidth="160" Margin="0 0 25 0"
+                    Style="{StaticResource StandardButton}"
+                    Command="{Binding CancelCommand}"/>
+            <Button Content="Create Tournament" MaxWidth="160"
+                    Margin="25 0 0 0" Style="{StaticResource StandardButton}"
+                    Command="{Binding CreateTournamentCommand}"/>
+        </StackPanel>
+        
     </Grid>
 </UserControl>
