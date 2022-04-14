@@ -42,7 +42,7 @@ namespace TrackerWPFUI.ViewModels
             CancelCommand = new RelayCommand(Cancel);
             CreateTeamCommand = new RelayCommand(CreateTeam, CanCreateTeam);
 
-            _memberList.CollectionChanged += MemberList_CollectionChanged;
+            MemberList.CollectionChanged += MemberList_CollectionChanged;
         }
 
         private void MemberList_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)

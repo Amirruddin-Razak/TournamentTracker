@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
@@ -14,26 +15,26 @@ namespace TrackerWPFUI.ViewModels
 {
     public class DashBoardViewModel : ViewModelBase
     {
-        private BindingList<TournamentModel> _tournamentList = new BindingList<TournamentModel>();
+        private ObservableCollection<TournamentModel> _tournamentList = new ObservableCollection<TournamentModel>();
         private TournamentModel _selectedTournament;
         private readonly NavigationStore _navigationStore;
 
         public DashBoardViewModel(NavigationStore navigationStore)
         {
-            TournamentList = new BindingList<TournamentModel>(GlobalConfig.connection.GetTournament_All().FindAll(x => x.Active));
+            TournamentList = new ObservableCollection<TournamentModel>(GlobalConfig.connection.GetTournament_All().FindAll(x => x.Active));
 
             CreateTournamentCommand = new RelayCommand(CreateTournament);
             ViewTournamentCommand = new RelayCommand(ViewTournament, CanViewTournament);
             _navigationStore = navigationStore;
         }
 
-        public BindingList<TournamentModel> TournamentList
+        public ObservableCollection<TournamentModel> TournamentList
         {
             get => _tournamentList;
             set
             {
                 _tournamentList = value;
-                OnPropertyChanged(nameof(TournamentList));
+                //OnPropertyChanged(nameof(TournamentList));
             }
         }
         public TournamentModel SelectedTournament
@@ -42,11 +43,11 @@ namespace TrackerWPFUI.ViewModels
             set
             {
                 _selectedTournament = value;
-                OnPropertyChanged(nameof(SelectedTournament));
+                //OnPropertyChanged(nameof(SelectedTournament));
                 ViewTournamentCommand.OnCanExecuteChanged(this, EventArgs.Empty);
             }
         }
-
+        
 
         public RelayCommand CreateTournamentCommand { get; set; }
         public RelayCommand ViewTournamentCommand { get; set; }
@@ -60,7 +61,7 @@ namespace TrackerWPFUI.ViewModels
 
         public void ViewTournament(object parameter)
         {
-            _navigationStore.CurrentViewModel = new TournamentViewerViewModel(SelectedTournament);
+            _navigationStore.CurrentViewModel = new TournamentViewerViewModel(_navigationStore, SelectedTournament);
         }
     }
 }

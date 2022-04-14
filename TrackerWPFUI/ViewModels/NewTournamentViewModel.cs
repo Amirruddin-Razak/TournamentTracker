@@ -46,24 +46,38 @@ namespace TrackerWPFUI.ViewModels
             CreatePrizeCommand = new RelayCommand(CreatePrize, CanCreatePrize);
             DeletePrizeCommand = new RelayCommand(DeletePrize, CanDeletePrize);
             CreateTournamentCommand = new RelayCommand(CreateTournament, CanCreateTournament);
+
+            EnteredTeam.CollectionChanged += EnteredTeam_CollectionChanged;
         }
 
+        private void EnteredTeam_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            _createTournamentCommand.OnCanExecuteChanged(this, EventArgs.Empty);
+        }
 
         public string TournamentName
         {
             get => _tournamentName;
-            set { _tournamentName = value; }
+            set
+            {
+                _tournamentName = value;
+                _createTournamentCommand.OnCanExecuteChanged(this, EventArgs.Empty);
+            }
         }
         public string EntreeFee
         {
             get => _entreefee;
-            set { _entreefee = value; }
+            set
+            {
+                _entreefee = value;
+                _createTournamentCommand.OnCanExecuteChanged(this, EventArgs.Empty);
+            }
         }
 
         public ObservableCollection<TeamModel> EnteredTeam
         {
             get => _enteredTeam;
-            set { _enteredTeam = value; }
+            set => _enteredTeam = value;
         }
         public TeamModel TeamToRemove
         {
@@ -78,7 +92,7 @@ namespace TrackerWPFUI.ViewModels
         public ObservableCollection<TeamModel> TeamList
         {
             get => _teamList;
-            set { _teamList = value; }
+            set => _teamList = value;
         }
         public TeamModel TeamToAdd
         {
@@ -93,7 +107,7 @@ namespace TrackerWPFUI.ViewModels
         public ObservableCollection<PrizeModel> PrizeList
         {
             get => _prizelist;
-            set { _prizelist = value; }
+            set => _prizelist = value;
         }
 
 
@@ -302,7 +316,7 @@ namespace TrackerWPFUI.ViewModels
                 EntreeFee = "0";
             }
 
-            if (TeamList.Count == 0)
+            if (EnteredTeam.Count < 2)
             {
                 return false;
             }
@@ -320,7 +334,7 @@ namespace TrackerWPFUI.ViewModels
 
             if (PrizeList.Count > 0)
             {
-                decimal totalIncome = entreeFee * TeamList.Count;
+                decimal totalIncome = entreeFee * EnteredTeam.Count;
 
                 decimal totalPrize = 0;
                 foreach (PrizeModel prize in PrizeList)
@@ -340,7 +354,7 @@ namespace TrackerWPFUI.ViewModels
                 TournamentName = TournamentName,
                 EntreeFee = entreeFee,
                 Prizes = PrizeList.ToList(),
-                TeamList = TeamList.ToList()
+                TeamList = EnteredTeam.ToList()
             };
 
             TournamentLogic.CreateNewTournament(tournament);
