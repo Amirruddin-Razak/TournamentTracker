@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,7 +15,7 @@ namespace TrackerWPFUI.ViewModels
     {
         private string _teamName;
         private PersonModel _selectedPlayer;
-        private BindingList<PersonModel> _playerList;
+        private ObservableCollection<PersonModel> _playerList;
         private ObservableCollection<PersonModel> _memberList = new ObservableCollection<PersonModel>();
         private PersonModel _selectedMember;
         private RelayCommand _addMemberCommand;
@@ -34,7 +32,7 @@ namespace TrackerWPFUI.ViewModels
 
         public NewTeamViewModel(NavigationStore navigationStore, NewTournamentViewModel newTournamentViewModel)
         {
-            _playerList = new BindingList<PersonModel>(GlobalConfig.connection.GetPerson_All());
+            _playerList = new ObservableCollection<PersonModel>(GlobalConfig.connection.GetPerson_All());
             _newTournamentViewModel = newTournamentViewModel;
             _navigationStore = navigationStore;
 
@@ -62,7 +60,7 @@ namespace TrackerWPFUI.ViewModels
             }
         }
 
-        public BindingList<PersonModel> PlayerList
+        public ObservableCollection<PersonModel> PlayerList
         {
             get => _playerList;
             set => _playerList = value;
