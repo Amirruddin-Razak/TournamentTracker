@@ -1,0 +1,8 @@
+﻿CREATE TABLE [dbo].[TeamMember]
+(
+	Id INT IDENTITY NOT NULL PRIMARY KEY,
+    PersonId INT NOT NULL,
+    TeamId INT NOT NULL,
+    CONSTRAINT FK_TeamMember_PersonId FOREIGN KEY (PersonId) REFERENCES Person(Id),
+    CONSTRAINT FK_TeamMember_TeamId FOREIGN KEY (TeamId) REFERENCES Team(Id)
+)
