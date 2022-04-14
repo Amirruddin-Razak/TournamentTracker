@@ -12,4 +12,8 @@
     <Style TargetType="ListBox" x:Key="StandardListBox">
         <Setter Property="Background" Value="{StaticResource BackgroundLightBrush}"/>
     </Style>
+    
+    <Style TargetType="ListView" x:Key="StandardListView">
+        <Setter Property="Background" Value="{StaticResource BackgroundLightBrush}"/>
+    </Style>
 </ResourceDictionary>

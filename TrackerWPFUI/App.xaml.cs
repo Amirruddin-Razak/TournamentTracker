@@ -17,6 +17,7 @@ namespace TrackerWPFUI
     public partial class App : Application
     {
         private readonly NavigationStore _navigationStore;
+
         public App()
         {
             _navigationStore = new NavigationStore();

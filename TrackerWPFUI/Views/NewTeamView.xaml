@@ -4,8 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:TrackerWPFUI.Views"
-             mc:Ignorable="d" FontSize="18"
-             d:DesignHeight="600" d:DesignWidth="800">
+             mc:Ignorable="d" FontSize="18" Background="White"
+             d:DesignHeight="700" d:DesignWidth="1000">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -29,38 +29,48 @@
         <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Vertical">
             <StackPanel Orientation="Horizontal" Margin="5 0 0 30">
                 <TextBlock Text="Team Name :" Margin="0 0 10 0"/>
-                <TextBox x:Name="TeamName" MinWidth="150"/>
+                <TextBox MinWidth="285" Style="{StaticResource StandardTextBox}"
+                         Text="{Binding TeamName, UpdateSourceTrigger=PropertyChanged}"/>
             </StackPanel>
 
             <TextBlock HorizontalAlignment="Center" Text="Select Memeber" Margin="0 0 10 0"/>
             <StackPanel Orientation="Horizontal" Margin="10">
-                <ComboBox MinWidth="200"/>
-                <Button Content="Add" Margin="10 0 0 0"/>
+                <ComboBox MinWidth="225" Margin="0 0 10 0"
+                          ItemsSource="{Binding PlayerList}" DisplayMemberPath="FullName"
+                          SelectedItem="{Binding SelectedPlayer}"/>
+                <Button Content="Add Member" Style="{StaticResource StandardButton}" MinWidth="160"
+                        Command="{Binding AddMemberCommand}"/>
             </StackPanel>
 
             <GroupBox  Header="Create New Member" Margin="0 20">
                 <StackPanel Orientation="Vertical">
                     <StackPanel Orientation="Horizontal" Margin="5">
                         <TextBlock Text="First Name : " MinWidth="140"/>
-                        <TextBox MinWidth="150"/>
+                        <TextBox MinWidth="250" Style="{StaticResource StandardTextBox}"
+                                 Text="{Binding FirstName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                     </StackPanel>
                     
                     <StackPanel Orientation="Horizontal" Margin="5">
                         <TextBlock Text="Last Name : " MinWidth="140"/>
-                        <TextBox MinWidth="150"/>
+                        <TextBox MinWidth="250" Style="{StaticResource StandardTextBox}"
+                                 Text="{Binding LastName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                     </StackPanel>
                     
                     <StackPanel Orientation="Horizontal" Margin="5">
                         <TextBlock Text="Email Address : " MinWidth="140"/>
-                        <TextBox MinWidth="150"/>
+                        <TextBox MinWidth="250" Style="{StaticResource StandardTextBox}"
+                                 Text="{Binding EmailAddress, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                     </StackPanel>
                     
                     <StackPanel Orientation="Horizontal" Margin="5">
                         <TextBlock Text="Phone Number : " MinWidth="140"/>
-                        <TextBox MinWidth="150"/>
+                        <TextBox MinWidth="250" Style="{StaticResource StandardTextBox}"
+                                 Text="{Binding PhoneNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                     </StackPanel>
                     
-                    <Button Content="Create Member" Margin="60 15"/>
+                    <Button Content="Create Member" Margin="60 15" MaxWidth="160"
+                            Style="{StaticResource StandardButton}"
+                            Command="{Binding CreateMemberCommand}"/>
                 </StackPanel>
             </GroupBox>
         </StackPanel>
@@ -68,8 +78,9 @@
         
         
         <!-- Column 2-->
-        <ListView x:Name="TeamMembers" Grid.Row="1" Grid.Column="2" MinHeight="250" MinWidth="250"
-                  Margin="30 0">
+        <ListView x:Name="TeamMembers" Grid.Row="1" Grid.Column="2" MinHeight="250"
+                  MinWidth="300" Margin="30 0" Style="{StaticResource StandardListView}"
+                  ItemsSource="{Binding MemberList}" SelectedItem="{Binding SelectedMember}">
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="HorizontalContentAlignment" Value="Center"/>
@@ -77,18 +88,38 @@
             </ListView.ItemContainerStyle>
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="First Name"/>
-                    <GridViewColumn Header="First Name"/>
-                    <GridViewColumn Header="First Name"/>
+                    <GridViewColumn Header="Full Name" Width="130">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding FullName}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Email" Width="160">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding EmailAddress}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
                 </GridView>
             </ListView.View>
         </ListView>
 
-        <Button Grid.Row="2" Grid.Column="2" Content="Create Team" Margin="100 20"/>
+        <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.Column="1"
+                    Grid.ColumnSpan="3" HorizontalAlignment="Center" Margin="0 50 0 0">
+            <Button Content="Cancel" Style="{StaticResource StandardButton}"
+                    Margin="0 0 15 0" MinWidth="160" Command="{Binding CancelCommand}"/>
+            <Button Content="Create Team" Style="{StaticResource StandardButton}"
+                    Margin="15 0 0 0" MinWidth="160" Command="{Binding CreateTeamCommand}"/>
+        </StackPanel>
 
 
         <!-- Column 3 -->
-        <Button Grid.Row="1" Grid.Column="3" Content="Remove" Margin="0 180"/>
+        <Button Grid.Row="1" Grid.Column="3" Margin="0 180" Content="Remove Member" 
+                MaxHeight="60" MaxWidth="100" Style="{StaticResource StandardButton}"
+                Command="{Binding RemoveMemberCommand}"/>
+
 
     </Grid>
 </UserControl>

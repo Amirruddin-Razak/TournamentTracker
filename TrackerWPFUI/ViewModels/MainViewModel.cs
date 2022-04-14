@@ -14,17 +14,17 @@ namespace TrackerWPFUI.ViewModels
 {
     public class MainViewModel : ViewModelBase
     {
-        private readonly Window _window;
         private NavigationStore _navigationStore;
-        private readonly double _cornerRadius = 8;
-        private readonly double _resizeBorder = 4;
-        private readonly double _outerMargin = 6;
-        private readonly double _titleBarHeight = SystemParameters.CaptionHeight;
 
         public MainViewModel(Window window, NavigationStore navigationStore)
         {
-            _window = window;
             _navigationStore = navigationStore;
+
+            _navigationStore.CurrentViewModelChanged += NavigationStore_CurrentViewModelChanged;
+
+
+            #region Custom Window Settings
+            _window = window;
 
             MinimizeWindowCommand = new RelayCommand(MinimizeWindow);
             MaximizeWindowCommand = new RelayCommand(MaximizeWindow);
@@ -32,15 +32,24 @@ namespace TrackerWPFUI.ViewModels
             WindowMenuCommand = new RelayCommand(WindowMenu);
 
             _window.StateChanged += Window_StateChanged;
-            _navigationStore.CurrentViewModelChanged += NavigationStore_CurrentViewModelChanged;
+            #endregion
         }
+
+        public ViewModelBase CurrentViewModel => _navigationStore.CurrentViewModel;
 
         private void NavigationStore_CurrentViewModelChanged()
         {
             OnPropertyChanged(nameof(CurrentViewModel));
         }
 
-        public ViewModelBase CurrentViewModel => _navigationStore.CurrentViewModel;
+
+        #region Custom Windo Settings
+        private readonly Window _window;
+        private readonly double _cornerRadius = 8;
+        private readonly double _resizeBorder = 4;
+        private readonly double _outerMargin = 6;
+        private readonly double _titleBarHeight = SystemParameters.CaptionHeight;
+
         public WindowChrome WinChrome
         {
             get
@@ -85,13 +94,10 @@ namespace TrackerWPFUI.ViewModels
             OnPropertyChanged(nameof(WindowCornerRadius));
             OnPropertyChanged(nameof(OpacityMaskCornerRadius));
             OnPropertyChanged(nameof(OuterMarginThickness));
-            //OnPropertyChanged(nameof(DropShadowCornerRadius));
-            //OnPropertyChanged(nameof(ResizeBorderThickness));
         }
 
         private void CloseWindow(object parameter) => SystemCommands.CloseWindow(_window);
         private void MinimizeWindow(object parameter) => SystemCommands.MinimizeWindow(_window);
-
         private void MaximizeWindow(object parameter)
         {
             if (_window.WindowState == WindowState.Maximized)
@@ -103,7 +109,6 @@ namespace TrackerWPFUI.ViewModels
                 SystemCommands.MaximizeWindow(_window);
             }
         }
-
         private void WindowMenu(object parameter) => SystemCommands.ShowSystemMenu(_window, GetMousePosition());
 
         private Point GetMousePosition()
@@ -111,11 +116,6 @@ namespace TrackerWPFUI.ViewModels
             Point mousePosRelativeToWindow = Mouse.GetPosition(_window);
             return new Point(mousePosRelativeToWindow.X + _window.Left, mousePosRelativeToWindow.Y + _window.Top);
         }
-
-
-
-        //public double CaptionHeight => _titleBarHeight - 2.5; // minus 2.5 to correct for drag area.
-        //public Thickness ResizeBorderThickness => new Thickness(_resizeBorder + _outerMargin);
-        //public CornerRadius DropShadowCornerRadius => new CornerRadius(_cornerRadius * 2);
+        #endregion
     }
 }

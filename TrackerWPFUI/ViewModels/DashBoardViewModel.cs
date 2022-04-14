@@ -18,6 +18,15 @@ namespace TrackerWPFUI.ViewModels
         private TournamentModel _selectedTournament;
         private readonly NavigationStore _navigationStore;
 
+        public DashBoardViewModel(NavigationStore navigationStore)
+        {
+            TournamentList = new BindingList<TournamentModel>(GlobalConfig.connection.GetTournament_All().FindAll(x => x.Active));
+
+            CreateTournamentCommand = new RelayCommand(CreateTournament);
+            ViewTournamentCommand = new RelayCommand(ViewTournament, CanViewTournament);
+            _navigationStore = navigationStore;
+        }
+
         public BindingList<TournamentModel> TournamentList
         {
             get => _tournamentList;
@@ -38,21 +47,13 @@ namespace TrackerWPFUI.ViewModels
             }
         }
 
-        public DashBoardViewModel(NavigationStore navigationStore)
-        {
-            TournamentList = new BindingList<TournamentModel>(GlobalConfig.connection.GetTournament_All().FindAll(x => x.Active));
-
-            CreateTournamentCommand = new RelayCommand(CreateTournament);
-            ViewTournamentCommand = new RelayCommand(ViewTournament, CanViewTournament);
-            _navigationStore = navigationStore;
-        }
 
         public RelayCommand CreateTournamentCommand { get; set; }
         public RelayCommand ViewTournamentCommand { get; set; }
 
         public void CreateTournament(object parameter)
         {
-            _navigationStore.CurrentViewModel = new NewTournamentViewModel();
+            _navigationStore.CurrentViewModel = new NewTournamentViewModel(_navigationStore);
         }
 
         public bool CanViewTournament(object parameter) => SelectedTournament != null;
