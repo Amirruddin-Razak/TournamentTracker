@@ -15,14 +15,7 @@ namespace TrackerWPFUI.ViewModels
     {
         private string _teamName;
         private PersonModel _selectedPlayer;
-        private ObservableCollection<PersonModel> _playerList;
-        private ObservableCollection<PersonModel> _memberList = new ObservableCollection<PersonModel>();
         private PersonModel _selectedMember;
-        private RelayCommand _addMemberCommand;
-        private RelayCommand _removeMemberCommand;
-        private RelayCommand _createMemberCommand;
-        private RelayCommand _cancelCommand;
-        private RelayCommand _createTeamCommand;
         private string _firstName;
         private string _lastName;
         private string _phoneNumber;
@@ -32,9 +25,10 @@ namespace TrackerWPFUI.ViewModels
 
         public NewTeamViewModel(NavigationStore navigationStore, NewTournamentViewModel newTournamentViewModel)
         {
-            _playerList = new ObservableCollection<PersonModel>(GlobalConfig.connection.GetPerson_All());
             _newTournamentViewModel = newTournamentViewModel;
             _navigationStore = navigationStore;
+
+            PlayerList = new ObservableCollection<PersonModel>(GlobalConfig.connection.GetPerson_All());
 
             AddMemberCommand = new RelayCommand(AddMember, CanAddMember);
             RemoveMemberCommand = new RelayCommand(RemoveMember, CanRemoveMember);
@@ -47,7 +41,7 @@ namespace TrackerWPFUI.ViewModels
 
         private void MemberList_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            _createTeamCommand.OnCanExecuteChanged(this, EventArgs.Empty);
+            CreateTeamCommand.OnCanExecuteChanged(this, EventArgs.Empty);
         }
 
         public string TeamName
@@ -56,65 +50,37 @@ namespace TrackerWPFUI.ViewModels
             set
             {
                 _teamName = value;
-                _createTeamCommand.OnCanExecuteChanged(this, EventArgs.Empty);
+                CreateTeamCommand.OnCanExecuteChanged(this, EventArgs.Empty);
             }
         }
 
-        public ObservableCollection<PersonModel> PlayerList
-        {
-            get => _playerList;
-            set => _playerList = value;
-        }
+        public ObservableCollection<PersonModel> PlayerList { get; set; }
         public PersonModel SelectedPlayer
         {
             get => _selectedPlayer;
             set
             {
                 _selectedPlayer = value;
-                _addMemberCommand.OnCanExecuteChanged(this, EventArgs.Empty);
+                AddMemberCommand.OnCanExecuteChanged(this, EventArgs.Empty);
             }
         }
 
-        public ObservableCollection<PersonModel> MemberList
-        {
-            get => _memberList;
-            set => _memberList = value;
-        }
+        public ObservableCollection<PersonModel> MemberList { get; set; } = new ObservableCollection<PersonModel>();
         public PersonModel SelectedMember
         {
             get => _selectedMember;
             set
             {
                 _selectedMember = value;
-                _removeMemberCommand.OnCanExecuteChanged(this, EventArgs.Empty);
+                RemoveMemberCommand.OnCanExecuteChanged(this, EventArgs.Empty);
             }
         }
 
-        public RelayCommand AddMemberCommand
-        {
-            get => _addMemberCommand;
-            set => _addMemberCommand = value;
-        }
-        public RelayCommand RemoveMemberCommand
-        {
-            get => _removeMemberCommand;
-            set => _removeMemberCommand = value;
-        }
-        public RelayCommand CreateMemberCommand
-        {
-            get => _createMemberCommand;
-            set => _createMemberCommand = value;
-        }
-        public RelayCommand CancelCommand
-        {
-            get => _cancelCommand;
-            set => _cancelCommand = value;
-        }
-        public RelayCommand CreateTeamCommand
-        {
-            get => _createTeamCommand;
-            set => _createTeamCommand = value;
-        }
+        public RelayCommand AddMemberCommand { get; set; }
+        public RelayCommand RemoveMemberCommand { get; set; }
+        public RelayCommand CreateMemberCommand { get; set; }
+        public RelayCommand CancelCommand { get; set; }
+        public RelayCommand CreateTeamCommand { get; set; }
 
 
         public string FirstName
@@ -123,7 +89,7 @@ namespace TrackerWPFUI.ViewModels
             set
             {
                 _firstName = value;
-                _createMemberCommand.OnCanExecuteChanged(this, EventArgs.Empty);
+                CreateMemberCommand.OnCanExecuteChanged(this, EventArgs.Empty);
             }
         }
         public string LastName
@@ -132,7 +98,7 @@ namespace TrackerWPFUI.ViewModels
             set
             {
                 _lastName = value;
-                _createMemberCommand.OnCanExecuteChanged(this, EventArgs.Empty);
+                CreateMemberCommand.OnCanExecuteChanged(this, EventArgs.Empty);
             }
         }
         public string EmailAddress
@@ -141,7 +107,7 @@ namespace TrackerWPFUI.ViewModels
             set
             {
                 _emailAddress = value;
-                _createMemberCommand.OnCanExecuteChanged(this, EventArgs.Empty);
+                CreateMemberCommand.OnCanExecuteChanged(this, EventArgs.Empty);
             }
         }
         public string PhoneNumber
@@ -150,7 +116,7 @@ namespace TrackerWPFUI.ViewModels
             set
             {
                 _phoneNumber = value;
-                _createMemberCommand.OnCanExecuteChanged(this, EventArgs.Empty);
+                CreateMemberCommand.OnCanExecuteChanged(this, EventArgs.Empty);
             }
         }
 
@@ -164,16 +130,16 @@ namespace TrackerWPFUI.ViewModels
 
         private void RemoveMember(object parameter)
         {
-            _playerList.Add(SelectedMember);
-            _memberList.Remove(SelectedMember);
+            PlayerList.Add(SelectedMember);
+            MemberList.Remove(SelectedMember);
         }
 
         private bool CanAddMember(object parameter) => SelectedPlayer != null;
 
         private void AddMember(object parameter)
         {
-            _memberList.Add(SelectedPlayer);
-            _playerList.Remove(SelectedPlayer);
+            MemberList.Add(SelectedPlayer);
+            PlayerList.Remove(SelectedPlayer);
         }
 
         private bool CanCreateMember(object arg)

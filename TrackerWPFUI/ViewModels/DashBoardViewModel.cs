@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,42 +14,33 @@ namespace TrackerWPFUI.ViewModels
 {
     public class DashBoardViewModel : ViewModelBase
     {
-        private ObservableCollection<TournamentModel> _tournamentList = new ObservableCollection<TournamentModel>();
         private TournamentModel _selectedTournament;
         private readonly NavigationStore _navigationStore;
 
         public DashBoardViewModel(NavigationStore navigationStore)
         {
+            _navigationStore = navigationStore;
+
             TournamentList = new ObservableCollection<TournamentModel>(GlobalConfig.connection.GetTournament_All().FindAll(x => x.Active));
 
             CreateTournamentCommand = new RelayCommand(CreateTournament);
             ViewTournamentCommand = new RelayCommand(ViewTournament, CanViewTournament);
-            _navigationStore = navigationStore;
         }
 
-        public ObservableCollection<TournamentModel> TournamentList
-        {
-            get => _tournamentList;
-            set
-            {
-                _tournamentList = value;
-                //OnPropertyChanged(nameof(TournamentList));
-            }
-        }
+        public ObservableCollection<TournamentModel> TournamentList { get; set; } = new ObservableCollection<TournamentModel>();
         public TournamentModel SelectedTournament
         {
             get => _selectedTournament;
             set
             {
                 _selectedTournament = value;
-                //OnPropertyChanged(nameof(SelectedTournament));
                 ViewTournamentCommand.OnCanExecuteChanged(this, EventArgs.Empty);
             }
         }
-        
 
         public RelayCommand CreateTournamentCommand { get; set; }
         public RelayCommand ViewTournamentCommand { get; set; }
+
 
         public void CreateTournament(object parameter)
         {

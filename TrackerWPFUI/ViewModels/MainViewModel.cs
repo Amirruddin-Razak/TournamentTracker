@@ -14,7 +14,7 @@ namespace TrackerWPFUI.ViewModels
 {
     public class MainViewModel : ViewModelBase
     {
-        private NavigationStore _navigationStore;
+        private readonly NavigationStore _navigationStore;
 
         public MainViewModel(Window window, NavigationStore navigationStore)
         {
@@ -95,9 +95,14 @@ namespace TrackerWPFUI.ViewModels
             OnPropertyChanged(nameof(OpacityMaskCornerRadius));
             OnPropertyChanged(nameof(OuterMarginThickness));
         }
-
-        private void CloseWindow(object parameter) => SystemCommands.CloseWindow(_window);
-        private void MinimizeWindow(object parameter) => SystemCommands.MinimizeWindow(_window);
+        private void CloseWindow(object parameter)
+        {
+            SystemCommands.CloseWindow(_window);
+        }
+        private void MinimizeWindow(object parameter)
+        {
+            SystemCommands.MinimizeWindow(_window);
+        }
         private void MaximizeWindow(object parameter)
         {
             if (_window.WindowState == WindowState.Maximized)
@@ -109,7 +114,10 @@ namespace TrackerWPFUI.ViewModels
                 SystemCommands.MaximizeWindow(_window);
             }
         }
-        private void WindowMenu(object parameter) => SystemCommands.ShowSystemMenu(_window, GetMousePosition());
+        private void WindowMenu(object parameter)
+        {
+            SystemCommands.ShowSystemMenu(_window, GetMousePosition());
+        }
 
         private Point GetMousePosition()
         {

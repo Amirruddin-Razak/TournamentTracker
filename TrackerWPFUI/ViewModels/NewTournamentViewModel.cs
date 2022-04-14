@@ -15,9 +15,6 @@ namespace TrackerWPFUI.ViewModels
     {
         private string _tournamentName;
         private string _entreefee;
-        private ObservableCollection<TeamModel> _teamList;
-        private ObservableCollection<TeamModel> _enteredTeam = new ObservableCollection<TeamModel>();
-        private ObservableCollection<PrizeModel> _prizelist = new ObservableCollection<PrizeModel>();
         private TeamModel _teamToAdd;
         private TeamModel _teamToRemove;
         private string _prizeName;
@@ -28,16 +25,12 @@ namespace TrackerWPFUI.ViewModels
         private PrizeModel _prizeToDelete;
         private readonly NavigationStore _navigationStore;
         private readonly DashBoardViewModel _dashBoardViewModel;
-        private RelayCommand _addTeamCommand;
-        private RelayCommand _removeTeamCommand;
-        private RelayCommand _createPrizeCommand;
-        private RelayCommand _deletePrizeCommand;
-        private RelayCommand _createTournamentCommand;
 
         public NewTournamentViewModel(NavigationStore navigationStore, DashBoardViewModel dashBoardViewModel)
         {
             _navigationStore = navigationStore;
             _dashBoardViewModel = dashBoardViewModel;
+
             TeamList = new ObservableCollection<TeamModel>(GlobalConfig.connection.GetTeam_All());
 
             CreateNewTeamCommand = new RelayCommand(CreateNewTeam);
@@ -52,7 +45,7 @@ namespace TrackerWPFUI.ViewModels
 
         private void EnteredTeam_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            _createTournamentCommand.OnCanExecuteChanged(this, EventArgs.Empty);
+            CreateTournamentCommand.OnCanExecuteChanged(this, EventArgs.Empty);
         }
 
         public string TournamentName
@@ -61,7 +54,7 @@ namespace TrackerWPFUI.ViewModels
             set
             {
                 _tournamentName = value;
-                _createTournamentCommand.OnCanExecuteChanged(this, EventArgs.Empty);
+                CreateTournamentCommand.OnCanExecuteChanged(this, EventArgs.Empty);
             }
         }
         public string EntreeFee
@@ -70,45 +63,33 @@ namespace TrackerWPFUI.ViewModels
             set
             {
                 _entreefee = value;
-                _createTournamentCommand.OnCanExecuteChanged(this, EventArgs.Empty);
+                CreateTournamentCommand.OnCanExecuteChanged(this, EventArgs.Empty);
             }
         }
 
-        public ObservableCollection<TeamModel> EnteredTeam
-        {
-            get => _enteredTeam;
-            set => _enteredTeam = value;
-        }
+        public ObservableCollection<TeamModel> EnteredTeam { get; set; } = new ObservableCollection<TeamModel>();
         public TeamModel TeamToRemove
         {
             get => _teamToRemove;
             set
             {
                 _teamToRemove = value;
-                _removeTeamCommand.OnCanExecuteChanged(this, EventArgs.Empty);
+                RemoveTeamCommand.OnCanExecuteChanged(this, EventArgs.Empty);
             }
         }
 
-        public ObservableCollection<TeamModel> TeamList
-        {
-            get => _teamList;
-            set => _teamList = value;
-        }
+        public ObservableCollection<TeamModel> TeamList { get; set; }
         public TeamModel TeamToAdd
         {
             get => _teamToAdd;
             set
             {
                 _teamToAdd = value;
-                _addTeamCommand.OnCanExecuteChanged(this, EventArgs.Empty);
+                AddTeamCommand.OnCanExecuteChanged(this, EventArgs.Empty);
             }
         }
 
-        public ObservableCollection<PrizeModel> PrizeList
-        {
-            get => _prizelist;
-            set => _prizelist = value;
-        }
+        public ObservableCollection<PrizeModel> PrizeList { get; set; } = new ObservableCollection<PrizeModel>();
 
 
         public string PrizeName
@@ -118,7 +99,7 @@ namespace TrackerWPFUI.ViewModels
             {
                 _prizeName = value;
                 OnPropertyChanged(nameof(PrizeName));
-                _createPrizeCommand.OnCanExecuteChanged(this, EventArgs.Empty);
+                CreatePrizeCommand.OnCanExecuteChanged(this, EventArgs.Empty);
             }
         }
         public string PrizeNumber
@@ -128,7 +109,7 @@ namespace TrackerWPFUI.ViewModels
             {
                 _prizeNumber = value;
                 OnPropertyChanged(nameof(PrizeNumber));
-                _createPrizeCommand.OnCanExecuteChanged(this, EventArgs.Empty);
+                CreatePrizeCommand.OnCanExecuteChanged(this, EventArgs.Empty);
             }
         }
         public string PrizeAmount
@@ -138,7 +119,7 @@ namespace TrackerWPFUI.ViewModels
             {
                 _prizeAmount = value;
                 OnPropertyChanged(nameof(PrizeAmount));
-                _createPrizeCommand.OnCanExecuteChanged(this, EventArgs.Empty);
+                CreatePrizeCommand.OnCanExecuteChanged(this, EventArgs.Empty);
             }
         }
         public string PrizePercentage
@@ -148,7 +129,7 @@ namespace TrackerWPFUI.ViewModels
             {
                 _prizePercentage = value;
                 OnPropertyChanged(nameof(PrizePercentage));
-                _createPrizeCommand.OnCanExecuteChanged(this, EventArgs.Empty);
+                CreatePrizeCommand.OnCanExecuteChanged(this, EventArgs.Empty);
             }
         }
         public bool UsePrizeAmount
@@ -179,38 +160,17 @@ namespace TrackerWPFUI.ViewModels
             set
             {
                 _prizeToDelete = value;
-                _deletePrizeCommand.OnCanExecuteChanged(this, EventArgs.Empty);
+                DeletePrizeCommand.OnCanExecuteChanged(this, EventArgs.Empty);
             }
         }
 
 
         public RelayCommand CreateNewTeamCommand { get; set; }
-        public RelayCommand AddTeamCommand
-        {
-            get => _addTeamCommand;
-            set => _addTeamCommand = value;
-        }
-        public RelayCommand RemoveTeamCommand
-        {
-            get => _removeTeamCommand;
-            set => _removeTeamCommand = value;
-        }
-        public RelayCommand CreatePrizeCommand
-        {
-            get => _createPrizeCommand;
-            set { _createPrizeCommand = value; }
-        }
-        public RelayCommand DeletePrizeCommand
-        {
-            get => _deletePrizeCommand;
-            set => _deletePrizeCommand = value;
-        }
-        public RelayCommand CreateTournamentCommand
-        {
-            get => _createTournamentCommand;
-            set => _createTournamentCommand = value;
-        }
-
+        public RelayCommand AddTeamCommand { get; set; }
+        public RelayCommand RemoveTeamCommand { get; set; }
+        public RelayCommand CreatePrizeCommand { get; set; }
+        public RelayCommand DeletePrizeCommand { get; set; }
+        public RelayCommand CreateTournamentCommand { get; set; }
 
 
         private void CreateNewTeam(object parameter)
