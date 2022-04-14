@@ -33,8 +33,6 @@ namespace TrackerWinFormUI
             string winner = tournament.Rounds.Find(x => x.First().MatchupRound == roundNumber.Last()).First().Winner.TeamName;
             MessageBox.Show($"Tournament has ended, The winner is { winner }");
 
-            _caller.ShowInTaskbar = true;
-            _caller.WindowState = FormWindowState.Normal;
             Close();
         }
 

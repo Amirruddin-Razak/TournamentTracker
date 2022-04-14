@@ -7,6 +7,6 @@ BEGIN
 	SET NOCOUNT ON;
 
     -- Insert statements for procedure here
-	SELECT *
-	FROM dbo.Person;
+	SELECT p.Id, p.FirstName, p.LastName, p.EmailAddress, p.PhoneNumber
+	FROM dbo.Person p;
 END

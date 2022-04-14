@@ -13,7 +13,7 @@ BEGIN
 	SET NOCOUNT ON;
 
     -- Insert statements for procedure here
-	SELECT t.*
+	SELECT t.Id, t.TeamName
 	FROM dbo.Team t
 	INNER JOIN dbo.TournamentEntry e ON t.Id = e.TeamId
 	WHERE e.TournamentId = @TournamentId;

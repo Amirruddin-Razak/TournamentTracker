@@ -8,7 +8,7 @@ BEGIN
 	SET NOCOUNT ON;
 
     -- Insert statements for procedure here
-	SELECT * 
-	FROM dbo.Team
-	WHERE Team.Id = @TeamId;
+	SELECT t.Id, t.TeamName
+	FROM dbo.Team t
+	WHERE t.Id = @TeamId;
 END

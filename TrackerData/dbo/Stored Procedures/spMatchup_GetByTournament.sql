@@ -13,8 +13,8 @@ BEGIN
 	SET NOCOUNT ON;
 
     -- Insert statements for procedure here
-	SELECT *
-	FROM dbo.Matchup
+	SELECT m.Id, m.MatchupRound, m.TournamentId, m.WinnerId
+	FROM dbo.Matchup m
 	WHERE TournamentId = @TournamentId
 	ORDER BY MatchupRound;
 END

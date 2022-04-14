@@ -12,7 +12,7 @@ BEGIN
 	SET NOCOUNT ON;
 
     -- Insert statements for procedure here
-	SELECT *
-	FROM dbo.Tournament
+	SELECT t.Id, t.TournamentName, t.EntreeFee, t.Active
+	FROM dbo.Tournament t
 	WHERE Active = 1;
 END

@@ -13,7 +13,7 @@ BEGIN
 	SET NOCOUNT ON;
 
     -- Insert statements for procedure here
-	SELECT p.*
+	SELECT p.Id, p.FirstName, p.LastName, p.EmailAddress, p.PhoneNumber
 	FROM dbo.TeamMember m
 	INNER JOIN dbo.Person p ON m.PersonId = p.Id
 	WHERE TeamId = @TeamId;

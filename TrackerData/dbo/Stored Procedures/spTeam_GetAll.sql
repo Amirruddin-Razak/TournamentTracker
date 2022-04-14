@@ -7,5 +7,6 @@ BEGIN
 	SET NOCOUNT ON;
 
     -- Insert statements for procedure here
-	SELECT * FROM dbo.Team;
+	SELECT t.Id, t.TeamName
+	FROM dbo.Team t;
 END
