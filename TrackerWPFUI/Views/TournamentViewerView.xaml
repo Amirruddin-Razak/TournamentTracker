@@ -3,10 +3,123 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:TrackerWPFUI.Views"
-             mc:Ignorable="d"
+             xmlns:local="clr-namespace:TrackerWPFUI.Views" xmlns:viewmodels="clr-namespace:TrackerWPFUI.ViewModels" d:DataContext="{d:DesignInstance Type=viewmodels:TournamentViewerViewModel}"
+             mc:Ignorable="d" Background="White" FontSize="18"
              d:DesignHeight="700" d:DesignWidth="1000">
     <Grid>
-            
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Page Title -->
+        <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="1"
+                    Grid.ColumnSpan="3" Margin="20 5 20 20" HorizontalAlignment="Center">
+            <TextBlock Text="Tournament : " FontSize="36" FontWeight="Bold"/>
+            <TextBlock Text="{Binding TournamentName}" FontSize="36" FontWeight="Bold"/>
+        </StackPanel>
+
+        <!-- Column 1 -->
+        <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1" Margin="0 15">
+            <TextBlock Text="Round : "/>
+            <ComboBox ItemsSource="{Binding RoundList}" SelectedItem="{Binding SelectedRoundNumber}"
+                      SelectedIndex="0" Margin="10 0 0 0" MinWidth="150"/>
+        </StackPanel>
+        
+        <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.Column="1" Margin="0 20 0 10">
+            <CheckBox IsChecked="{Binding UpcomingMatchOnly}" Margin="0 0 10 0"
+                      VerticalAlignment="Center"/>
+            <TextBlock Text="Upcoming Match Only"/>
+        </StackPanel>
+
+        <ListView Grid.Row="3" Grid.Column="1" MinHeight="350" MinWidth="450" Width="auto"
+                  Margin="0 5 20 0" Style="{StaticResource StandardListView}"
+                  ItemsSource="{Binding CurrentRound}" SelectedItem="{Binding SelectedMatchup}">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="{x:Type ListViewItem}">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                </Style>
+            </ListView.ItemContainerStyle>
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Team 1" Width="auto">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding FirstTeamName}"
+                                           HorizontalAlignment="Center"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Score" Width="auto">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding FirstTeamScore}"
+                                           HorizontalAlignment="Center"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header=" VS " Width="auto">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate/>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Score" Width="auto">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding SecondTeamScore}"
+                                           HorizontalAlignment="Center"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Team 2" Width="auto">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding SecondTeamName}"
+                                           HorizontalAlignment="Center"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+        
+        <!-- Column 2 -->
+        <StackPanel Orientation="Vertical" Grid.Row="3" Grid.Column="2"
+                    VerticalAlignment="Center" Margin="20 0">
+            <TextBlock Text="{Binding FirstTeamName, FallbackValue=Team 1 Name}" 
+                       HorizontalAlignment="Center" Margin="0 10"/>
+            <TextBox Text="{Binding FirstTeamScore, FallbackValue= 0, UpdateSourceTrigger=PropertyChanged}"
+                     HorizontalContentAlignment="Center" MinWidth="150"
+                     IsEnabled="{Binding CanScoreFirstTeam}"
+                     Style="{StaticResource StandardTextBox}"/>
+            <TextBlock Text=" VS " HorizontalAlignment="Center" Margin="0 30"/>
+            <TextBox Text="{Binding SecondTeamScore, FallbackValue=0, UpdateSourceTrigger=PropertyChanged}"
+                     HorizontalContentAlignment="Center" MinWidth="150"
+                     IsEnabled="{Binding CanScoreSecondTeam}"
+                     Style="{StaticResource StandardTextBox}"/>
+            <TextBlock Text="{Binding SecondTeamName, FallbackValue=Team 2 Name}"
+                       HorizontalAlignment="Center" Margin="0 10"/>
+        </StackPanel>
+        
+        <!-- Column 3 -->
+        <Button Grid.Row="3" Grid.Column="3" Content="Save Score" MinWidth="150"
+                Style="{StaticResource StandardButton}" Command="{Binding SaveScoreCommand}"/>
+        
+        <!-- Row 4 -->
+        <Button Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="3" MinWidth="150"
+                HorizontalAlignment="Center" Margin="0 50 0 0" Content="Close" 
+                Style="{StaticResource StandardButton}" Command="{Binding CloseCommand}"/>
     </Grid>
 </UserControl>

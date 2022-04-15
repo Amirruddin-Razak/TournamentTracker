@@ -51,7 +51,7 @@ namespace TrackerWPFUI.ViewModels
 
         public void ViewTournament(object parameter)
         {
-            _navigationStore.CurrentViewModel = new TournamentViewerViewModel(_navigationStore, SelectedTournament);
+            _navigationStore.CurrentViewModel = new TournamentViewerViewModel(_navigationStore, this, SelectedTournament);
         }
     }
 }

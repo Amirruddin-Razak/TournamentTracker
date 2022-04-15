@@ -55,6 +55,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Models\MatchupModel.cs" />
     <Compile Include="ViewModels\NewTeamViewModel.cs" />
     <Compile Include="ViewModels\NewTournamentViewModel.cs" />
     <Compile Include="ViewModels\TournamentViewerViewModel.cs" />
@@ -142,9 +143,7 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Models\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Resource Include="Images\Tournament Tracker.ico" />
   </ItemGroup>
