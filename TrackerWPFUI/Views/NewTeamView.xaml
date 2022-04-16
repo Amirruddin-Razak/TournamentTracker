@@ -3,10 +3,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:TrackerWPFUI.Views"
-             mc:Ignorable="d" FontSize="18"
+             xmlns:local="clr-namespace:TrackerWPFUI.Views" xmlns:viewmodels="clr-namespace:TrackerWPFUI.ViewModels" d:DataContext="{d:DesignInstance Type=viewmodels:NewTeamViewModel}"
+             mc:Ignorable="d" FontSize="18" Background="White"
              d:DesignHeight="700" d:DesignWidth="1000">
     <Grid>
+        
+
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="auto"/>
@@ -30,7 +32,8 @@
             <StackPanel Orientation="Horizontal" Margin="5 0 0 30">
                 <TextBlock Text="Team Name :" Margin="0 0 10 0"/>
                 <TextBox MinWidth="285" Style="{StaticResource StandardTextBox}"
-                         Text="{Binding TeamName, UpdateSourceTrigger=PropertyChanged}"/>
+                         Text="{Binding TeamName, UpdateSourceTrigger=PropertyChanged}">
+                </TextBox>
             </StackPanel>
 
             <TextBlock HorizontalAlignment="Center" Text="Select Memeber" Margin="0 0 10 0"/>

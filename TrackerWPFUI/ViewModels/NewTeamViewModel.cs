@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using TrackerLibrary;
 using TrackerLibrary.Models;
@@ -11,7 +15,7 @@ using TrackerWPFUI.ViewModels.Base;
 
 namespace TrackerWPFUI.ViewModels
 {
-    public class NewTeamViewModel : ViewModelBase
+    public class NewTeamViewModel : ViewModelBase, INotifyDataErrorInfo
     {
         private string _teamName;
         private PersonModel _selectedPlayer;
@@ -22,6 +26,9 @@ namespace TrackerWPFUI.ViewModels
         private string _emailAddress;
         private readonly NewTournamentViewModel _newTournamentViewModel;
         private readonly NavigationStore _navigationStore;
+        private readonly Dictionary<string, List<string>> _propertyErrors = new Dictionary<string, List<string>>();
+
+        public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
 
         public NewTeamViewModel(NavigationStore navigationStore, NewTournamentViewModel newTournamentViewModel)
         {
@@ -50,6 +57,7 @@ namespace TrackerWPFUI.ViewModels
             set
             {
                 _teamName = value;
+
                 CreateTeamCommand.OnCanExecuteChanged(this, EventArgs.Empty);
             }
         }
@@ -120,6 +128,7 @@ namespace TrackerWPFUI.ViewModels
             }
         }
 
+        public bool HasErrors => _propertyErrors.Any();
 
         private void Cancel(object parameter)
         {
@@ -152,6 +161,13 @@ namespace TrackerWPFUI.ViewModels
 
         private void CreateMember(object parameter)
         {
+            ValidateMember();
+
+            if (HasErrors)
+            {
+                return;
+            }
+
             PersonModel member = new PersonModel()
             {
                 FirstName = FirstName,
@@ -179,6 +195,13 @@ namespace TrackerWPFUI.ViewModels
 
         private void CreateTeam(object parameter)
         {
+            ValidateTeam();
+
+            if (HasErrors)
+            {
+                return;
+            }
+
             TeamModel team = new TeamModel()
             {
                 TeamName = TeamName,
@@ -190,6 +213,79 @@ namespace TrackerWPFUI.ViewModels
             _newTournamentViewModel.EnteredTeam.Add(team);
 
             _navigationStore.CurrentViewModel = _newTournamentViewModel;
+        }
+
+        public IEnumerable GetErrors(string propertyName)
+        {
+            _propertyErrors.TryGetValue(propertyName, out List<string> output);
+            return output;
+        }
+
+        private void AddError(string propertyName, string errorMessage)
+        {
+            if (!_propertyErrors.ContainsKey(propertyName))
+            {
+                _propertyErrors.Add(propertyName, new List<string>());
+            }
+
+            _propertyErrors[propertyName].Add(errorMessage);
+
+            OnErrorsChanged(propertyName);
+        }
+
+        private void OnErrorsChanged(string propertyName)
+        {
+            ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
+        }
+
+        private void ValidateMember()
+        {
+            _propertyErrors.Clear();
+
+            if (FirstName.Length > 100)
+            {
+                AddError(nameof(FirstName), "First Name cannot be more than 100 character long");
+                OnErrorsChanged(nameof(FirstName));
+            }
+
+            if (LastName.Length > 100)
+            {
+                AddError(nameof(LastName), "Last Name cannot be more than 100 character long");
+                OnErrorsChanged(nameof(LastName));
+            }
+
+            if (EmailAddress.Length > 200)
+            {
+                AddError(nameof(EmailAddress), "Email Address cannot be more than 200 character long");
+                OnErrorsChanged(nameof(EmailAddress));
+            }
+            else if (!Regex.IsMatch(EmailAddress, @"^(?:[\.A-z0-9!#$%&'*+/=?^_`{|}~-]+@(?:[A-z0-9-])+(?:.)+[A-z0-9])$"))
+            {
+                AddError(nameof(EmailAddress), "Please enter a valid email address");
+                OnErrorsChanged(nameof(EmailAddress));
+            }
+
+            if (PhoneNumber.Length > 20)
+            {
+                AddError(nameof(PhoneNumber), "Phone Number cannot be more than 20 character long");
+                OnErrorsChanged(nameof(PhoneNumber));
+            }
+            else if (!Regex.IsMatch(PhoneNumber, @"^[0-9+\s-]*$"))
+            {
+                AddError(nameof(PhoneNumber), "Please enter a valid phone number");
+                OnErrorsChanged(nameof(PhoneNumber));
+            }
+        }
+
+        private void ValidateTeam()
+        {
+            _propertyErrors.Clear();
+
+            if (_teamName.Length > 20)
+            {
+                AddError(nameof(TeamName), "Team Name cannot be more than 20 character long");
+                OnErrorsChanged(nameof(TeamName));
+            }
         }
     }
 }
