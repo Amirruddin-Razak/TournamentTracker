@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{02655DE9-5A29-44B4-BC0A-6817849C5A3E}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>TrackerUI</RootNamespace>
-    <AssemblyName>TrackerUI</AssemblyName>
+    <RootNamespace>TrackerWinFormUI</RootNamespace>
+    <AssemblyName>TrackerWinFormUI</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -51,9 +51,6 @@
   </PropertyGroup>
   <PropertyGroup>
     <ManifestCertificateThumbprint>BA30594955B2A82722DF5B19A288E65D42D8E576</ManifestCertificateThumbprint>
-  </PropertyGroup>
-  <PropertyGroup>
-    <ManifestKeyFile>TrackerWinFormUI_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <GenerateManifests>true</GenerateManifests>
