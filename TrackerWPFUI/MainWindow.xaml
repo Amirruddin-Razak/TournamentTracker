@@ -60,8 +60,8 @@
                                             <Button Style="{StaticResource ResourceKey=TitleBarIcon}"
                                                 Command="{Binding WindowMenuCommand}">
                                                 <Button.Background>
-                                                    <ImageBrush ImageSource="pack://application:,,,/Images/TournamentTracker.png"
-                                                            Stretch="Uniform"/>
+                                                    <ImageBrush 
+                                                            Stretch="Uniform" ImageSource="/Images/TournamentTracker.png"/>
                                                 </Button.Background>
                                             </Button>
                                             <Viewbox>
