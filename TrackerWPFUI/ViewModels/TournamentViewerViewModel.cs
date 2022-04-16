@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,7 +15,7 @@ using TrackerWPFUI.ViewModels.Base;
 
 namespace TrackerWPFUI.ViewModels
 {
-    public class TournamentViewerViewModel : ViewModelBase
+    public class TournamentViewerViewModel : ViewModelBase, INotifyDataErrorInfo
     {
         private const string _bye = "--- byes ---";
         private const string _notYetSet = "Not Yet Determined";
@@ -28,6 +30,9 @@ namespace TrackerWPFUI.ViewModels
         private string _secondTeamScore;
         private string _firstTeamName;
         private string _secondTeamName;
+        private readonly Dictionary<string, List<string>> _propertyErrors = new Dictionary<string, List<string>>();
+
+        public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
 
         public TournamentViewerViewModel(NavigationStore navigationStore, DashBoardViewModel dashBoardViewModel, TournamentModel tournament)
         {
@@ -138,6 +143,7 @@ namespace TrackerWPFUI.ViewModels
         public RelayCommand CloseCommand { get; set; }
         public RelayCommand SaveScoreCommand { get; set; }
 
+        public bool HasErrors => _propertyErrors.Any();
 
         private void Close(object parameter)
         {
@@ -154,9 +160,8 @@ namespace TrackerWPFUI.ViewModels
             {
                 return false;
             }
-            else if (FirstTeamScore == SecondTeamScore)
+            else if (string.IsNullOrWhiteSpace(FirstTeamScore) || string.IsNullOrWhiteSpace(SecondTeamScore))
             {
-                //TODO display error tie game not handled
                 return false;
             }
 
@@ -165,9 +170,10 @@ namespace TrackerWPFUI.ViewModels
 
         private void SaveScore(object parameter)
         {
-            if (!double.TryParse(FirstTeamScore, out double firstTeamScore) || !double.TryParse(SecondTeamScore, out double secondTeamScore))
+            ValidateScore(out double firstTeamScore, out double secondTeamScore);
+
+            if (HasErrors)
             {
-                //TODO Display error invalid input value
                 return;
             }
 
@@ -183,6 +189,32 @@ namespace TrackerWPFUI.ViewModels
             if (CurrentRound.Count == 0 && SelectedRoundNumber < RoundList.Last())
             {
                 SelectedRoundNumber += 1;
+            }
+        }
+
+        private void ValidateScore(out double firstTeamScore, out double secondTeamScore)
+        {
+            ClearError(nameof(FirstTeamScore));
+            ClearError(nameof(SecondTeamScore));
+
+            if (!double.TryParse(FirstTeamScore, out firstTeamScore))
+            {
+                AddError(nameof(FirstTeamScore), "Please Enter a valid score");
+                OnErrorsChanged(nameof(FirstTeamScore));
+            }
+
+            if (!double.TryParse(SecondTeamScore, out secondTeamScore))
+            {
+                AddError(nameof(SecondTeamScore), "Please Enter a valid score");
+                OnErrorsChanged(nameof(SecondTeamScore));
+            }
+
+            if (firstTeamScore == secondTeamScore)
+            {
+                AddError(nameof(FirstTeamScore), "Tie game are not allowed");
+                OnErrorsChanged(nameof(FirstTeamScore));
+                AddError(nameof(SecondTeamScore), "Tie game are not allowed");
+                OnErrorsChanged(nameof(SecondTeamScore));
             }
         }
 
@@ -246,5 +278,39 @@ namespace TrackerWPFUI.ViewModels
 
             OnPropertyChanged(nameof(CurrentRound));
         }
+
+        public IEnumerable GetErrors(string propertyName)
+        {
+            _propertyErrors.TryGetValue(propertyName, out List<string> output);
+            return output;
+        }
+
+        private void AddError(string propertyName, string errorMessage)
+        {
+            if (!_propertyErrors.ContainsKey(propertyName))
+            {
+                _propertyErrors.Add(propertyName, new List<string>());
+            }
+
+            _propertyErrors[propertyName].Add(errorMessage);
+
+            OnErrorsChanged(propertyName);
+        }
+
+        private void ClearError(string propertyName)
+        {
+            if (_propertyErrors.ContainsKey(propertyName))
+            {
+                _propertyErrors.Remove(propertyName);
+                OnErrorsChanged(propertyName);
+            }
+        }
+
+        private void OnErrorsChanged(string propertyName)
+        {
+            ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
+        }
+
+
     }
 }
