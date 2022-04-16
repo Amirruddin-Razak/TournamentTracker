@@ -56,14 +56,19 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Models\MatchupModel.cs" />
+    <Compile Include="Services\NotificationService.cs" />
     <Compile Include="ViewModels\NewTeamViewModel.cs" />
     <Compile Include="ViewModels\NewTournamentViewModel.cs" />
+    <Compile Include="ViewModels\StatusInfoViewModel.cs" />
     <Compile Include="ViewModels\TournamentViewerViewModel.cs" />
     <Compile Include="Views\NewTeamView.xaml.cs">
       <DependentUpon>NewTeamView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\NewTournamentView.xaml.cs">
       <DependentUpon>NewTournamentView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\StatusInfoView.xaml.cs">
+      <DependentUpon>StatusInfoView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\TournamentViewerView.xaml.cs">
       <DependentUpon>TournamentViewerView.xaml</DependentUpon>
@@ -109,6 +114,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\NewTournamentView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\StatusInfoView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

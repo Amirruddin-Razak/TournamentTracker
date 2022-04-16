@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using TrackerLibrary;
 using TrackerLibrary.Models;
 using TrackerWPF.Models;
+using TrackerWPF.Services;
 using TrackerWPFUI.Commands;
 using TrackerWPFUI.Stores;
 using TrackerWPFUI.ViewModels.Base;
@@ -56,8 +57,9 @@ namespace TrackerWPFUI.ViewModels
         private void Tournament_OnTournamentComplete(object sender, DateTime e)
         {
             string winner = _tournament.Rounds.Find(x => x.First().MatchupRound == RoundList.Last()).First().Winner.TeamName;
-            //TODO Display tournament complete message
-            //MessageBox.Show($"Tournament has ended, The winner is { winner }");
+
+            NotificationService notificationService = new NotificationService();
+            notificationService.NotifyUser("Tournament Ended", $"Team { winner } has won the tournament");
 
             _dashBoardViewModel.TournamentList.Remove(_tournament);
             Close(null);
