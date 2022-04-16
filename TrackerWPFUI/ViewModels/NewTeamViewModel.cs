@@ -233,6 +233,15 @@ namespace TrackerWPFUI.ViewModels
             OnErrorsChanged(propertyName);
         }
 
+        private void ClearError(string propertyName)
+        {
+            if (_propertyErrors.ContainsKey(propertyName))
+            {
+                _propertyErrors.Remove(propertyName);
+                OnErrorsChanged(propertyName);
+            }
+        }
+
         private void OnErrorsChanged(string propertyName)
         {
             ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
@@ -240,7 +249,10 @@ namespace TrackerWPFUI.ViewModels
 
         private void ValidateMember()
         {
-            _propertyErrors.Clear();
+            ClearError(nameof(FirstName));
+            ClearError(nameof(LastName));
+            ClearError(nameof(EmailAddress));
+            ClearError(nameof(PhoneNumber));
 
             if (FirstName.Length > 100)
             {
@@ -279,9 +291,9 @@ namespace TrackerWPFUI.ViewModels
 
         private void ValidateTeam()
         {
-            _propertyErrors.Clear();
+            ClearError(nameof(TeamName));
 
-            if (_teamName.Length > 20)
+            if (TeamName.Length > 20)
             {
                 AddError(nameof(TeamName), "Team Name cannot be more than 20 character long");
                 OnErrorsChanged(nameof(TeamName));
