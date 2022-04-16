@@ -3,11 +3,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:TrackerWPFUI.Views"
-             mc:Ignorable="d" FontSize="14"
+             xmlns:local="clr-namespace:TrackerWPFUI.Views" xmlns:viewmodels="clr-namespace:TrackerWPFUI.ViewModels" d:DataContext="{d:DesignInstance Type=viewmodels:NewTournamentViewModel}"
+             mc:Ignorable="d" FontSize="14" Background="White"
              d:DesignHeight="700" d:DesignWidth="1000">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <Style TargetType="ListViewItem">
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        </Style>
     </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -135,7 +138,7 @@
         <!-- Column 2 -->
         <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="2"
                     Margin="10 0 5 10">
-            <ListBox MinHeight="200" MinWidth="200"
+            <ListBox MinHeight="200" MinWidth="400"
                      Style="{StaticResource StandardListBox}"
                      ItemsSource="{Binding EnteredTeam}"
                      DisplayMemberPath="TeamName"
@@ -147,11 +150,51 @@
 
         <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.Column="2"
                     Margin="10 10 5 0">
-            <ListBox MinHeight="200" MinWidth="200"
-                     Style="{StaticResource StandardListBox}"
+            <StackPanel Orientation="Vertical">
+                <ListView MinHeight="200" MinWidth="400"
+                     Style="{StaticResource StandardListView}"
                      ItemsSource="{Binding PrizeList}"
-                     DisplayMemberPath="PrizeName"
-                     SelectedItem="{Binding PrizeToDelete}"/>
+                     SelectedItem="{Binding PrizeToDelete}">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="Prize Name">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock HorizontalAlignment="Center" Text="{Binding PrizeName}"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="Prize Number">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock HorizontalAlignment="Center" Text="{Binding PlaceNumber}"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="Prize Amount">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock HorizontalAlignment="Center" Text="{Binding PrizeAmount}"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="Prize Percentage">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock HorizontalAlignment="Center" Text="{Binding PrizePercentage}"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+                <TextBlock Text="{Binding PrizeListErrorMessage}"
+                           Foreground="Red"
+                           Visibility="{Binding IsPrizeListErrorVisible,
+                                        Converter={StaticResource BooleanToVisibilityConverter},
+                                        FallbackValue=Collapsed}"/>
+            </StackPanel>
+            
             <Button Content="Delete Prize" MaxWidth="160" Margin="10 0"
                     Style="{StaticResource StandardButton}"
                     Command="{Binding DeletePrizeCommand}"/>
@@ -165,7 +208,7 @@
             <Button Content="Cancel" MinWidth="160" Margin="0 0 25 0"
                     Style="{StaticResource StandardButton}"
                     Command="{Binding CancelCommand}"/>
-            <Button Content="Create Tournament" MaxWidth="160"
+            <Button Content="Create Tournament" MinWidth="160"
                     Margin="25 0 0 0" Style="{StaticResource StandardButton}"
                     Command="{Binding CreateTournamentCommand}"/>
         </StackPanel>

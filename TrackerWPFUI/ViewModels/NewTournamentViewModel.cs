@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,7 +14,7 @@ using TrackerWPFUI.ViewModels.Base;
 
 namespace TrackerWPFUI.ViewModels
 {
-    public class NewTournamentViewModel : ViewModelBase
+    public class NewTournamentViewModel : ViewModelBase, INotifyDataErrorInfo
     {
         private string _tournamentName;
         private string _entreefee;
@@ -25,6 +28,9 @@ namespace TrackerWPFUI.ViewModels
         private PrizeModel _prizeToDelete;
         private readonly NavigationStore _navigationStore;
         private readonly DashBoardViewModel _dashBoardViewModel;
+        private readonly Dictionary<string, List<string>> _propertyErrors = new Dictionary<string, List<string>>();
+
+        public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
 
         public NewTournamentViewModel(NavigationStore navigationStore, DashBoardViewModel dashBoardViewModel)
         {
@@ -92,6 +98,16 @@ namespace TrackerWPFUI.ViewModels
         }
 
         public ObservableCollection<PrizeModel> PrizeList { get; set; } = new ObservableCollection<PrizeModel>();
+        public bool IsPrizeListErrorVisible => _propertyErrors.ContainsKey(nameof(PrizeList));
+        public string PrizeListErrorMessage
+        {
+            get
+            {
+                OnPropertyChanged(nameof(IsPrizeListErrorVisible));
+
+                return _propertyErrors.ContainsKey(nameof(PrizeList)) ? _propertyErrors[nameof(PrizeList)].FirstOrDefault() : null;
+            }
+        }
 
 
         public string PrizeName
@@ -175,6 +191,7 @@ namespace TrackerWPFUI.ViewModels
         public RelayCommand CreateTournamentCommand { get; set; }
         public RelayCommand CancelCommand { get; set; }
 
+        public bool HasErrors => _propertyErrors.Any();
 
         private void CreateNewTeam(object parameter)
         {
@@ -203,7 +220,7 @@ namespace TrackerWPFUI.ViewModels
             {
                 return false;
             }
-            
+
             if (string.IsNullOrWhiteSpace(PrizeNumber))
             {
                 return false;
@@ -211,53 +228,77 @@ namespace TrackerWPFUI.ViewModels
 
             if (UsePrizeAmount)
             {
-                return decimal.TryParse(PrizeAmount, out decimal result) &&
-                    result > 0;
+                return !string.IsNullOrWhiteSpace(PrizeAmount);
             }
             else
             {
-                return decimal.TryParse(PrizePercentage, out decimal result) &&
-                    result > 0 && result <= 100;
+                return !string.IsNullOrWhiteSpace(PrizePercentage);
             }
         }
 
         private void CreatePrize(object parameter)
         {
-            PrizeModel prize;
+            ValidatePrize(out int placeNumber, out decimal prizeAmount, out double prizePercentage);
 
-            if (UsePrizeAmount)
+            if (HasErrors)
             {
-                bool isValidPrize = decimal.TryParse(PrizeAmount, out decimal result) && result > 0;
-                if (!isValidPrize)
-                {
-                    //TODO Display Error
-                    return;
-                }
-            }
-            else
-            {
-                bool isValidPrize = decimal.TryParse(PrizePercentage, out decimal result) && result > 0 && result <= 100;
-                if (!isValidPrize)
-                {
-                    //TODO Display Error
-                    return;
-                }
+                return;
             }
 
-            if (UsePrizeAmount)
+            PrizeModel prize = new PrizeModel()
             {
-                prize = new PrizeModel(PrizeName, PrizeNumber, UsePrizeAmount, PrizeAmount);
-            }
-            else
-            {
-                prize = new PrizeModel(PrizeName, PrizeNumber, UsePrizeAmount, PrizePercentage);
-            }
+                PrizeName = PrizeName,
+                PlaceNumber = placeNumber,
+                PrizeAmount = prizeAmount,
+                PrizePercentage = prizePercentage
+            };
 
             PrizeList.Add(prize);
 
             PrizeName = null;
             PrizeNumber = null;
             UsePrizeAmount = true;
+        }
+
+        private void ValidatePrize(out int placeNumber, out decimal prizeAmount, out double prizePercentage)
+        {
+            ClearError(nameof(PrizeName));
+            ClearError(nameof(PrizeNumber));
+            ClearError(nameof(PrizeAmount));
+            ClearError(nameof(PrizePercentage));
+
+            if (PrizeName.Length > 20)
+            {
+                AddError(nameof(PrizeName), "Prize Name must not exceed 20 character");
+                OnErrorsChanged(nameof(PrizeName));
+            }
+
+            if (!int.TryParse(PrizeNumber, out placeNumber))
+            {
+                AddError(nameof(PrizeNumber), "Please enter a valid integer number");
+                OnErrorsChanged(nameof(PrizeNumber));
+            }
+
+            prizeAmount = 0;
+            prizePercentage = 0;
+            if (UsePrizeAmount)
+            {
+                bool isValidPrize = decimal.TryParse(PrizeAmount, out prizeAmount) && prizeAmount > 0;
+                if (!isValidPrize)
+                {
+                    AddError(nameof(PrizeAmount), "Prize Amount must be greater than 0");
+                    OnErrorsChanged(nameof(PrizeAmount));
+                }
+            }
+            else
+            {
+                bool isValidPrize = double.TryParse(PrizePercentage, out prizePercentage) && prizePercentage > 0 && prizePercentage <= 100;
+                if (!isValidPrize)
+                {
+                    AddError(nameof(PrizePercentage), "Prize Percentage must be between 0 to 100");
+                    OnErrorsChanged(nameof(PrizePercentage));
+                }
+            }
         }
 
         private bool CanDeletePrize(object parameter) => PrizeToDelete != null;
@@ -289,27 +330,11 @@ namespace TrackerWPFUI.ViewModels
 
         private void CreateTournament(object parameter)
         {
-            if (!decimal.TryParse(EntreeFee, out decimal entreeFee) || entreeFee < 0)
+            ValidateTournament(out decimal entreeFee);
+
+            if (HasErrors)
             {
-                //TODO display Error
                 return;
-            }
-
-            if (PrizeList.Count > 0)
-            {
-                decimal totalIncome = entreeFee * EnteredTeam.Count;
-
-                decimal totalPrize = 0;
-                foreach (PrizeModel prize in PrizeList)
-                {
-                    totalPrize += prize.CalculatePrize(totalIncome);
-                }
-
-                if (totalPrize > totalIncome)
-                {
-                    //TODO display error
-                    return;
-                }
             }
 
             TournamentModel tournament = new TournamentModel()
@@ -326,9 +351,79 @@ namespace TrackerWPFUI.ViewModels
             _navigationStore.CurrentViewModel = _dashBoardViewModel;
         }
 
+        private void ValidateTournament(out decimal entreeFee)
+        {
+            ClearError(nameof(TournamentName));
+            ClearError(nameof(EntreeFee));
+            ClearError(nameof(PrizeList));
+            OnPropertyChanged(nameof(PrizeListErrorMessage));
+
+            if (TournamentName.Length > 50)
+            {
+                AddError(nameof(TournamentName), "Tournament Name cannot be more than 50 character long");
+                OnErrorsChanged(nameof(TournamentName));
+            }
+
+            if (!decimal.TryParse(EntreeFee, out entreeFee) || entreeFee < 0)
+            {
+                AddError(nameof(EntreeFee), "Please enter a valid positive number");
+                OnErrorsChanged(nameof(EntreeFee));
+            }
+
+            if (PrizeList.Count > 0)
+            {
+                decimal totalIncome = entreeFee * EnteredTeam.Count;
+
+                decimal totalPrize = 0;
+                foreach (PrizeModel prize in PrizeList)
+                {
+                    totalPrize += prize.CalculatePrize(totalIncome);
+                }
+
+                if (totalPrize > totalIncome)
+                {
+                    AddError(nameof(PrizeList), "Total Prize Amount must not exceed Total Collected Fees");
+                    OnErrorsChanged(nameof(PrizeList));
+                    OnPropertyChanged(nameof(PrizeListErrorMessage));
+                }
+            }
+        }
+
         private void Cancel(object parameter)
         {
             _navigationStore.CurrentViewModel = _dashBoardViewModel;
+        }
+
+        public IEnumerable GetErrors(string propertyName)
+        {
+            _propertyErrors.TryGetValue(propertyName, out List<string> output);
+            return output;
+        }
+
+        private void AddError(string propertyName, string errorMessage)
+        {
+            if (!_propertyErrors.ContainsKey(propertyName))
+            {
+                _propertyErrors.Add(propertyName, new List<string>());
+            }
+
+            _propertyErrors[propertyName].Add(errorMessage);
+
+            OnErrorsChanged(propertyName);
+        }
+
+        private void ClearError(string propertyName)
+        {
+            if (_propertyErrors.ContainsKey(propertyName))
+            {
+                _propertyErrors.Remove(propertyName);
+                OnErrorsChanged(propertyName);
+            }
+        }
+
+        private void OnErrorsChanged(string propertyName)
+        {
+            ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
         }
     }
 }
