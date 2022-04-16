@@ -5,8 +5,6 @@ VisualStudioVersion = 16.0.31624.102
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrackerLibrary", "TrackerLibrary\TrackerLibrary.csproj", "{3336AFF9-4DB3-46BC-BEBB-C0B646C5ABA0}"
 EndProject
-Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "TrackerData", "TrackerData\TrackerData.sqlproj", "{C90225AF-09EF-496B-A6AA-B9A921FD41C2}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrackerWinFormUI", "TrackerWinFormUI\TrackerWinFormUI.csproj", "{02655DE9-5A29-44B4-BC0A-6817849C5A3E}"
 EndProject
 Global
@@ -19,12 +17,6 @@ Global
 		{3336AFF9-4DB3-46BC-BEBB-C0B646C5ABA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3336AFF9-4DB3-46BC-BEBB-C0B646C5ABA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3336AFF9-4DB3-46BC-BEBB-C0B646C5ABA0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C90225AF-09EF-496B-A6AA-B9A921FD41C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C90225AF-09EF-496B-A6AA-B9A921FD41C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C90225AF-09EF-496B-A6AA-B9A921FD41C2}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
-		{C90225AF-09EF-496B-A6AA-B9A921FD41C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C90225AF-09EF-496B-A6AA-B9A921FD41C2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C90225AF-09EF-496B-A6AA-B9A921FD41C2}.Release|Any CPU.Deploy.0 = Release|Any CPU
 		{02655DE9-5A29-44B4-BC0A-6817849C5A3E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{02655DE9-5A29-44B4-BC0A-6817849C5A3E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{02655DE9-5A29-44B4-BC0A-6817849C5A3E}.Release|Any CPU.ActiveCfg = Release|Any CPU
