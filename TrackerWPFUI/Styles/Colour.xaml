@@ -1,0 +1,33 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Color x:Key="BackgroundVeryLight">#fefefe</Color>
+    <SolidColorBrush x:Key="BackgroundVeryLightBrush" Color="{StaticResource BackgroundVeryLight}"/>
+
+    <Color x:Key="BackgroundLight">#ece8ed</Color>
+    <SolidColorBrush x:Key="BackgroundLightBrush" Color="{StaticResource BackgroundLight}"/>
+
+    <Color x:Key="TitleBarBackground">Purple</Color>
+    <SolidColorBrush x:Key="TitleBarBackgroundBrush" Color="{StaticResource TitleBarBackground}"/>
+    
+    <Color x:Key="TitleBarForeground">AntiqueWhite</Color>
+    <SolidColorBrush x:Key="TitleBarForegroundBrush" Color="{StaticResource TitleBarForeground}"/>
+
+    <Color x:Key="HoverBackground">LightGray</Color>
+    <SolidColorBrush x:Key="HoverBackgroundBrush" Color="{StaticResource HoverBackground}"/>
+
+    <Color x:Key="HoverForeground">Black</Color>
+    <SolidColorBrush x:Key="HoverForegroundBrush" Color="{StaticResource HoverForeground}"/>
+
+    <Color x:Key="CloseButtonHoverBackground">Red</Color>
+    <SolidColorBrush x:Key="CloseButtonHoverBackgroundBrush" Color="{StaticResource CloseButtonHoverBackground}"/>
+
+    <Color x:Key="CloseButtonHoverForeground">White</Color>
+    <SolidColorBrush x:Key="CloseButtonHoverForegroundBrush" Color="{StaticResource CloseButtonHoverForeground}"/>
+
+    <Color x:Key="DisabledButtonBackground">Gray</Color>
+    <SolidColorBrush x:Key="DisabledButtonBackgroundBrush" Color="{StaticResource DisabledButtonBackground}"/>
+
+    <Color x:Key="DisabledButtonForeground">lightgray</Color>
+    <SolidColorBrush x:Key="DisabledButtonForegroundBrush" Color="{StaticResource DisabledButtonForeground}"/>
+</ResourceDictionary>
