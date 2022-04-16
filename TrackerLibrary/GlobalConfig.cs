@@ -1,4 +1,5 @@
-﻿using System.Configuration;
+﻿using Microsoft.Extensions.Configuration;
+using System.Configuration;
 using TrackerLibrary.DataAccess;
 
 namespace TrackerLibrary
@@ -13,9 +14,12 @@ namespace TrackerLibrary
         public const string TournamentFileName = "TournamentModels.csv";
 
         public static IDataConnection connection;
+        private static IConfiguration _config;
 
-        public static void InitiallizeConnection(DatabaseType databaseType)
+        public static void InitiallizeConnection(DatabaseType databaseType, IConfiguration config)
         {
+            _config = config;
+
             if (databaseType == DatabaseType.Sql)
             {
                 connection = new SqlConnector();
@@ -26,8 +30,28 @@ namespace TrackerLibrary
             }
         }
 
-        public static string GetCnnString(string name) => ConfigurationManager.ConnectionStrings[name].ConnectionString;
+        public static string GetCnnString(string name)
+        {
+            if (_config == null)
+            {
+                return ConfigurationManager.ConnectionStrings[name].ConnectionString;
+            }
+            else
+            {
+                return _config.GetConnectionString(name);
+            }
+        }
 
-        public static string AppKeyLookup(string key) => ConfigurationManager.AppSettings[key];
+        public static string AppKeyLookup(string key)
+        {
+            if (_config == null)
+            {
+                return ConfigurationManager.AppSettings[key];
+            }
+            else
+            {
+                return _config.GetSection("appSettings")[key];
+            }
+        }
     }
 }
