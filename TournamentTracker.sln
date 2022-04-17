@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrackerLibrary", "TrackerLi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrackerWinFormUI", "TrackerWinFormUI\TrackerWinFormUI.csproj", "{02655DE9-5A29-44B4-BC0A-6817849C5A3E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrackerWPFUI", "TrackerWPFUI\TrackerWPFUI.csproj", "{47156831-3AE3-4DFE-8C80-10A3CCEC898D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrackerWPFUI", "TrackerWPFUI\TrackerWPFUI.csproj", "{47156831-3AE3-4DFE-8C80-10A3CCEC898D}"
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "TrackerData", "TrackerData\TrackerData.sqlproj", "{C90225AF-09EF-496B-A6AA-B9A921FD41C2}"
 EndProject

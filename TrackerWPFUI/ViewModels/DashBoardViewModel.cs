@@ -16,11 +16,12 @@ namespace TrackerWPFUI.ViewModels
     {
         private TournamentModel _selectedTournament;
         private readonly NavigationStore _navigationStore;
+        private readonly ModalNavigationStore _modalNavigationStore;
 
-        public DashBoardViewModel(NavigationStore navigationStore)
+        public DashBoardViewModel(NavigationStore navigationStore, ModalNavigationStore modalNavigationStore)
         {
             _navigationStore = navigationStore;
-
+            _modalNavigationStore = modalNavigationStore;
             TournamentList = new ObservableCollection<TournamentModel>(GlobalConfig.connection.GetTournament_All().FindAll(x => x.Active));
 
             CreateTournamentCommand = new RelayCommand(CreateTournament);
@@ -51,7 +52,7 @@ namespace TrackerWPFUI.ViewModels
 
         public void ViewTournament(object parameter)
         {
-            _navigationStore.CurrentViewModel = new TournamentViewerViewModel(_navigationStore, this, SelectedTournament);
+            _navigationStore.CurrentViewModel = new TournamentViewerViewModel(_navigationStore, _modalNavigationStore, this, SelectedTournament);
         }
     }
 }

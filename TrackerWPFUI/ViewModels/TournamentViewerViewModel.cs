@@ -22,6 +22,7 @@ namespace TrackerWPFUI.ViewModels
         private const string _notYetSet = "Not Yet Determined";
 
         private readonly NavigationStore _navigationStore;
+        private readonly ModalNavigationStore _modalNavigationStore;
         private readonly DashBoardViewModel _dashBoardViewModel;
         private readonly TournamentModel _tournament;
         private int _selectedRoundNumber = 1;
@@ -35,9 +36,10 @@ namespace TrackerWPFUI.ViewModels
 
         public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
 
-        public TournamentViewerViewModel(NavigationStore navigationStore, DashBoardViewModel dashBoardViewModel, TournamentModel tournament)
+        public TournamentViewerViewModel(NavigationStore navigationStore, ModalNavigationStore modalNavigationStore, DashBoardViewModel dashBoardViewModel, TournamentModel tournament)
         {
             _navigationStore = navigationStore;
+            _modalNavigationStore = modalNavigationStore;
             _dashBoardViewModel = dashBoardViewModel;
             _tournament = tournament;
 
@@ -58,8 +60,9 @@ namespace TrackerWPFUI.ViewModels
         {
             string winner = _tournament.Rounds.Find(x => x.First().MatchupRound == RoundList.Last()).First().Winner.TeamName;
 
-            NotificationService notificationService = new NotificationService();
-            notificationService.NotifyUser("Tournament Ended", $"Team { winner } has won the tournament");
+            string header = "Tournament Ended";
+            string message = $"Team { winner } has won the tournament";
+            _modalNavigationStore.CurrentViewModel = new StatusInfoViewModel(header, message, _modalNavigationStore);
 
             _dashBoardViewModel.TournamentList.Remove(_tournament);
             Close(null);
@@ -312,7 +315,5 @@ namespace TrackerWPFUI.ViewModels
         {
             ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
         }
-
-
     }
 }

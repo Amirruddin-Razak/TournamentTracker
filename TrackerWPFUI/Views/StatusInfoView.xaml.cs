@@ -18,7 +18,7 @@ namespace TrackerWPFUI.Views
     /// <summary>
     /// Interaction logic for StatusInfoView.xaml
     /// </summary>
-    public partial class StatusInfoView : Window
+    public partial class StatusInfoView : UserControl
     {
         public StatusInfoView()
         {

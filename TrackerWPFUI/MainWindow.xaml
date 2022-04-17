@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:TrackerWPFUI"
         xmlns:view="clr-namespace:TrackerWPFUI.Views"
         xmlns:viewmodel="clr-namespace:TrackerWPFUI.ViewModels" d:DataContext="{d:DesignInstance Type=viewmodel:MainViewModel}"
+        xmlns:custom="clr-namespace:TrackerWPFUI.CustomControls"
         mc:Ignorable="d" WindowStartupLocation="CenterScreen"
         WindowStyle="None" AllowsTransparency="True"
         MinHeight="{Binding MinWindowHeight}" MinWidth="{Binding MinWindowWidth}"
@@ -108,7 +109,14 @@
             <DataTemplate DataType="{x:Type viewmodel:TournamentViewerViewModel}">
                 <view:TournamentViewerView/>
             </DataTemplate>
+            <DataTemplate DataType="{x:Type viewmodel:StatusInfoViewModel}">
+                <view:StatusInfoView/>
+            </DataTemplate>
         </Grid.Resources>
+
+        <custom:Modal Panel.ZIndex="100" IsOpen="{Binding IsModalOpen}">
+            <ContentControl Content="{Binding CurrentModalViewModel}"/>
+        </custom:Modal>
         
         <ContentControl Content="{Binding CurrentViewModel}"/>
     </Grid>

@@ -11,6 +11,7 @@ using System.Windows;
 using TrackerLibrary;
 using TrackerWPFUI.Stores;
 using TrackerWPFUI.ViewModels;
+using TrackerWPFUI.Views;
 
 namespace TrackerWPFUI
 {
@@ -20,19 +21,21 @@ namespace TrackerWPFUI
     public partial class App : Application
     {
         private readonly NavigationStore _navigationStore;
+        private readonly ModalNavigationStore _modalNavigationStore;
 
         public App()
         {
             _navigationStore = new NavigationStore();
+            _modalNavigationStore = new ModalNavigationStore();
         }
 
         protected override void OnStartup(StartupEventArgs e)
         {
             GlobalConfig.InitiallizeConnection(DatabaseType.TextFile, InitializeConfiguration());
-            _navigationStore.CurrentViewModel = new DashBoardViewModel(_navigationStore);
+            _navigationStore.CurrentViewModel = new DashBoardViewModel(_navigationStore, _modalNavigationStore);
 
             Window mainWindow = new MainWindow();
-            mainWindow.DataContext = new MainViewModel(mainWindow, _navigationStore);
+            mainWindow.DataContext = new MainViewModel(mainWindow, _navigationStore, _modalNavigationStore);
             MainWindow = mainWindow;
             MainWindow.Show();
             base.OnStartup(e);
