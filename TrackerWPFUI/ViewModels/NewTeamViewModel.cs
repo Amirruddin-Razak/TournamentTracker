@@ -26,7 +26,7 @@ namespace TrackerWPFUI.ViewModels
         private string _emailAddress;
         private readonly NewTournamentViewModel _newTournamentViewModel;
         private readonly NavigationStore _navigationStore;
-        private readonly Dictionary<string, List<string>> _propertyErrors = new Dictionary<string, List<string>>();
+        private readonly ViewModelValidation _viewModelValidation;
 
         public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
 
@@ -34,6 +34,7 @@ namespace TrackerWPFUI.ViewModels
         {
             _newTournamentViewModel = newTournamentViewModel;
             _navigationStore = navigationStore;
+            _viewModelValidation = new ViewModelValidation();
 
             PlayerList = new ObservableCollection<PersonModel>(GlobalConfig.connection.GetPerson_All());
 
@@ -44,6 +45,7 @@ namespace TrackerWPFUI.ViewModels
             CreateTeamCommand = new RelayCommand(CreateTeam, CanCreateTeam);
 
             MemberList.CollectionChanged += MemberList_CollectionChanged;
+            _viewModelValidation.ErrorsChanged += ViewModelValidation_ErrorsChanged;
         }
 
         private void MemberList_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -128,7 +130,7 @@ namespace TrackerWPFUI.ViewModels
             }
         }
 
-        public bool HasErrors => _propertyErrors.Any();
+        public bool HasErrors => _viewModelValidation.HasErrors;
 
         private void Cancel(object parameter)
         {
@@ -136,7 +138,6 @@ namespace TrackerWPFUI.ViewModels
         }
 
         private bool CanRemoveMember(object parameter) => SelectedMember != null;
-
         private void RemoveMember(object parameter)
         {
             PlayerList.Add(SelectedMember);
@@ -144,7 +145,6 @@ namespace TrackerWPFUI.ViewModels
         }
 
         private bool CanAddMember(object parameter) => SelectedPlayer != null;
-
         private void AddMember(object parameter)
         {
             MemberList.Add(SelectedPlayer);
@@ -158,7 +158,6 @@ namespace TrackerWPFUI.ViewModels
                 !string.IsNullOrWhiteSpace(EmailAddress) &&
                 !string.IsNullOrWhiteSpace(PhoneNumber);
         }
-
         private void CreateMember(object parameter)
         {
             ValidateMember();
@@ -190,9 +189,43 @@ namespace TrackerWPFUI.ViewModels
             OnPropertyChanged(nameof(EmailAddress));
             OnPropertyChanged(nameof(PhoneNumber));
         }
+        private void ValidateMember()
+        {
+            _viewModelValidation.ClearError(nameof(FirstName));
+            _viewModelValidation.ClearError(nameof(LastName));
+            _viewModelValidation.ClearError(nameof(EmailAddress));
+            _viewModelValidation.ClearError(nameof(PhoneNumber));
+
+            if (FirstName.Length > 100)
+            {
+                _viewModelValidation.AddError(nameof(FirstName), "First Name cannot be more than 100 character long");
+            }
+
+            if (LastName.Length > 100)
+            {
+                _viewModelValidation.AddError(nameof(LastName), "Last Name cannot be more than 100 character long");
+            }
+
+            if (EmailAddress.Length > 200)
+            {
+                _viewModelValidation.AddError(nameof(EmailAddress), "Email Address cannot be more than 200 character long");
+            }
+            else if (!Regex.IsMatch(EmailAddress, @"^(?:[\.A-z0-9!#$%&'*+/=?^_`{|}~-]+@(?:[A-z0-9-])+(?:.)+[A-z0-9])$"))
+            {
+                _viewModelValidation.AddError(nameof(EmailAddress), "Please enter a valid email address");
+            }
+
+            if (PhoneNumber.Length > 20)
+            {
+                _viewModelValidation.AddError(nameof(PhoneNumber), "Phone Number cannot be more than 20 character long");
+            }
+            else if (!Regex.IsMatch(PhoneNumber, @"^[0-9+\s-]*$"))
+            {
+                _viewModelValidation.AddError(nameof(PhoneNumber), "Please enter a valid phone number");
+            }
+        }
 
         private bool CanCreateTeam(object parameter) => !string.IsNullOrWhiteSpace(TeamName) && MemberList.Count != 0;
-
         private void CreateTeam(object parameter)
         {
             ValidateTeam();
@@ -214,90 +247,24 @@ namespace TrackerWPFUI.ViewModels
 
             _navigationStore.CurrentViewModel = _newTournamentViewModel;
         }
-
-        public IEnumerable GetErrors(string propertyName)
-        {
-            _propertyErrors.TryGetValue(propertyName, out List<string> output);
-            return output;
-        }
-
-        private void AddError(string propertyName, string errorMessage)
-        {
-            if (!_propertyErrors.ContainsKey(propertyName))
-            {
-                _propertyErrors.Add(propertyName, new List<string>());
-            }
-
-            _propertyErrors[propertyName].Add(errorMessage);
-
-            OnErrorsChanged(propertyName);
-        }
-
-        private void ClearError(string propertyName)
-        {
-            if (_propertyErrors.ContainsKey(propertyName))
-            {
-                _propertyErrors.Remove(propertyName);
-                OnErrorsChanged(propertyName);
-            }
-        }
-
-        private void OnErrorsChanged(string propertyName)
-        {
-            ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
-        }
-
-        private void ValidateMember()
-        {
-            ClearError(nameof(FirstName));
-            ClearError(nameof(LastName));
-            ClearError(nameof(EmailAddress));
-            ClearError(nameof(PhoneNumber));
-
-            if (FirstName.Length > 100)
-            {
-                AddError(nameof(FirstName), "First Name cannot be more than 100 character long");
-                OnErrorsChanged(nameof(FirstName));
-            }
-
-            if (LastName.Length > 100)
-            {
-                AddError(nameof(LastName), "Last Name cannot be more than 100 character long");
-                OnErrorsChanged(nameof(LastName));
-            }
-
-            if (EmailAddress.Length > 200)
-            {
-                AddError(nameof(EmailAddress), "Email Address cannot be more than 200 character long");
-                OnErrorsChanged(nameof(EmailAddress));
-            }
-            else if (!Regex.IsMatch(EmailAddress, @"^(?:[\.A-z0-9!#$%&'*+/=?^_`{|}~-]+@(?:[A-z0-9-])+(?:.)+[A-z0-9])$"))
-            {
-                AddError(nameof(EmailAddress), "Please enter a valid email address");
-                OnErrorsChanged(nameof(EmailAddress));
-            }
-
-            if (PhoneNumber.Length > 20)
-            {
-                AddError(nameof(PhoneNumber), "Phone Number cannot be more than 20 character long");
-                OnErrorsChanged(nameof(PhoneNumber));
-            }
-            else if (!Regex.IsMatch(PhoneNumber, @"^[0-9+\s-]*$"))
-            {
-                AddError(nameof(PhoneNumber), "Please enter a valid phone number");
-                OnErrorsChanged(nameof(PhoneNumber));
-            }
-        }
-
         private void ValidateTeam()
         {
-            ClearError(nameof(TeamName));
+            _viewModelValidation.ClearError(nameof(TeamName));
 
             if (TeamName.Length > 20)
             {
-                AddError(nameof(TeamName), "Team Name cannot be more than 20 character long");
-                OnErrorsChanged(nameof(TeamName));
+                _viewModelValidation.AddError(nameof(TeamName), "Team Name cannot be more than 20 character long");
             }
+        }
+
+        public IEnumerable GetErrors(string propertyName)
+        {
+            return _viewModelValidation.GetErrors(propertyName);
+        }
+
+        private void ViewModelValidation_ErrorsChanged(object sender, DataErrorsChangedEventArgs e)
+        {
+            ErrorsChanged?.Invoke(this, e);
         }
     }
 }

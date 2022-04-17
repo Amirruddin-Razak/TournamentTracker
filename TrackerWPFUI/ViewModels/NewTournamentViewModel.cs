@@ -27,8 +27,8 @@ namespace TrackerWPFUI.ViewModels
         private bool _usePrizeAmount = true;
         private PrizeModel _prizeToDelete;
         private readonly NavigationStore _navigationStore;
+        private readonly ViewModelValidation _viewModelValidation;
         private readonly DashBoardViewModel _dashBoardViewModel;
-        private readonly Dictionary<string, List<string>> _propertyErrors = new Dictionary<string, List<string>>();
 
         public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
 
@@ -36,6 +36,7 @@ namespace TrackerWPFUI.ViewModels
         {
             _navigationStore = navigationStore;
             _dashBoardViewModel = dashBoardViewModel;
+            _viewModelValidation = new ViewModelValidation();
 
             TeamList = new ObservableCollection<TeamModel>(GlobalConfig.connection.GetTeam_All());
 
@@ -48,8 +49,8 @@ namespace TrackerWPFUI.ViewModels
             CancelCommand = new RelayCommand(Cancel);
 
             EnteredTeam.CollectionChanged += EnteredTeam_CollectionChanged;
+            _viewModelValidation.ErrorsChanged += ViewModelValidation_ErrorsChanged;
         }
-
 
         private void EnteredTeam_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
@@ -98,14 +99,14 @@ namespace TrackerWPFUI.ViewModels
         }
 
         public ObservableCollection<PrizeModel> PrizeList { get; set; } = new ObservableCollection<PrizeModel>();
-        public bool IsPrizeListErrorVisible => _propertyErrors.ContainsKey(nameof(PrizeList));
+        public bool IsPrizeListErrorVisible => _viewModelValidation.HasSpecificError(nameof(PrizeList));
         public string PrizeListErrorMessage
         {
             get
             {
                 OnPropertyChanged(nameof(IsPrizeListErrorVisible));
 
-                return _propertyErrors.ContainsKey(nameof(PrizeList)) ? _propertyErrors[nameof(PrizeList)].FirstOrDefault() : null;
+                return GetErrors(nameof(PrizeList))?.Cast<string>().First();
             }
         }
 
@@ -191,7 +192,7 @@ namespace TrackerWPFUI.ViewModels
         public RelayCommand CreateTournamentCommand { get; set; }
         public RelayCommand CancelCommand { get; set; }
 
-        public bool HasErrors => _propertyErrors.Any();
+        public bool HasErrors => _viewModelValidation.HasErrors;
 
         private void CreateNewTeam(object parameter)
         {
@@ -199,7 +200,6 @@ namespace TrackerWPFUI.ViewModels
         }
 
         private bool CanAddTeam(object parameter) => TeamToAdd != null;
-
         private void AddTeam(object parameter)
         {
             EnteredTeam.Add(TeamToAdd);
@@ -207,7 +207,6 @@ namespace TrackerWPFUI.ViewModels
         }
 
         private bool CanRemoveTeam(object parameter) => TeamToRemove != null;
-
         private void RemoveTeam(object parameter)
         {
             TeamList.Add(TeamToRemove);
@@ -235,7 +234,6 @@ namespace TrackerWPFUI.ViewModels
                 return !string.IsNullOrWhiteSpace(PrizePercentage);
             }
         }
-
         private void CreatePrize(object parameter)
         {
             ValidatePrize(out int placeNumber, out decimal prizeAmount, out double prizePercentage);
@@ -259,24 +257,21 @@ namespace TrackerWPFUI.ViewModels
             PrizeNumber = null;
             UsePrizeAmount = true;
         }
-
         private void ValidatePrize(out int placeNumber, out decimal prizeAmount, out double prizePercentage)
         {
-            ClearError(nameof(PrizeName));
-            ClearError(nameof(PrizeNumber));
-            ClearError(nameof(PrizeAmount));
-            ClearError(nameof(PrizePercentage));
+            _viewModelValidation.ClearError(nameof(PrizeName));
+            _viewModelValidation.ClearError(nameof(PrizeNumber));
+            _viewModelValidation.ClearError(nameof(PrizeAmount));
+            _viewModelValidation.ClearError(nameof(PrizePercentage));
 
             if (PrizeName.Length > 20)
             {
-                AddError(nameof(PrizeName), "Prize Name must not exceed 20 character");
-                OnErrorsChanged(nameof(PrizeName));
+                _viewModelValidation.AddError(nameof(PrizeName), "Prize Name must not exceed 20 character");
             }
 
             if (!int.TryParse(PrizeNumber, out placeNumber))
             {
-                AddError(nameof(PrizeNumber), "Please enter a valid integer number");
-                OnErrorsChanged(nameof(PrizeNumber));
+                _viewModelValidation.AddError(nameof(PrizeNumber), "Please enter a valid integer number");
             }
 
             prizeAmount = 0;
@@ -286,8 +281,7 @@ namespace TrackerWPFUI.ViewModels
                 bool isValidPrize = decimal.TryParse(PrizeAmount, out prizeAmount) && prizeAmount > 0;
                 if (!isValidPrize)
                 {
-                    AddError(nameof(PrizeAmount), "Prize Amount must be greater than 0");
-                    OnErrorsChanged(nameof(PrizeAmount));
+                    _viewModelValidation.AddError(nameof(PrizeAmount), "Prize Amount must be greater than 0");
                 }
             }
             else
@@ -295,14 +289,12 @@ namespace TrackerWPFUI.ViewModels
                 bool isValidPrize = double.TryParse(PrizePercentage, out prizePercentage) && prizePercentage > 0 && prizePercentage <= 100;
                 if (!isValidPrize)
                 {
-                    AddError(nameof(PrizePercentage), "Prize Percentage must be between 0 to 100");
-                    OnErrorsChanged(nameof(PrizePercentage));
+                    _viewModelValidation.AddError(nameof(PrizePercentage), "Prize Percentage must be between 0 to 100");
                 }
             }
         }
 
         private bool CanDeletePrize(object parameter) => PrizeToDelete != null;
-
         private void DeletePrize(object parameter)
         {
             PrizeList.Remove(PrizeToDelete);
@@ -327,7 +319,6 @@ namespace TrackerWPFUI.ViewModels
 
             return true;
         }
-
         private void CreateTournament(object parameter)
         {
             ValidateTournament(out decimal entreeFee);
@@ -350,24 +341,21 @@ namespace TrackerWPFUI.ViewModels
             _dashBoardViewModel.TournamentList.Add(tournament);
             _navigationStore.CurrentViewModel = _dashBoardViewModel;
         }
-
         private void ValidateTournament(out decimal entreeFee)
         {
-            ClearError(nameof(TournamentName));
-            ClearError(nameof(EntreeFee));
-            ClearError(nameof(PrizeList));
+            _viewModelValidation.ClearError(nameof(TournamentName));
+            _viewModelValidation.ClearError(nameof(EntreeFee));
+            _viewModelValidation.ClearError(nameof(PrizeList));
             OnPropertyChanged(nameof(PrizeListErrorMessage));
 
             if (TournamentName.Length > 50)
             {
-                AddError(nameof(TournamentName), "Tournament Name cannot be more than 50 character long");
-                OnErrorsChanged(nameof(TournamentName));
+                _viewModelValidation.AddError(nameof(TournamentName), "Tournament Name cannot be more than 50 character long");
             }
 
             if (!decimal.TryParse(EntreeFee, out entreeFee) || entreeFee < 0)
             {
-                AddError(nameof(EntreeFee), "Please enter a valid positive number");
-                OnErrorsChanged(nameof(EntreeFee));
+                _viewModelValidation.AddError(nameof(EntreeFee), "Please enter a valid positive number");
             }
 
             if (PrizeList.Count > 0)
@@ -382,8 +370,7 @@ namespace TrackerWPFUI.ViewModels
 
                 if (totalPrize > totalIncome)
                 {
-                    AddError(nameof(PrizeList), "Total Prize Amount must not exceed Total Collected Fees");
-                    OnErrorsChanged(nameof(PrizeList));
+                    _viewModelValidation.AddError(nameof(PrizeList), "Total Prize Amount must not exceed Total Collected Fees");
                     OnPropertyChanged(nameof(PrizeListErrorMessage));
                 }
             }
@@ -396,34 +383,12 @@ namespace TrackerWPFUI.ViewModels
 
         public IEnumerable GetErrors(string propertyName)
         {
-            _propertyErrors.TryGetValue(propertyName, out List<string> output);
-            return output;
+            return _viewModelValidation.GetErrors(propertyName);
         }
 
-        private void AddError(string propertyName, string errorMessage)
+        private void ViewModelValidation_ErrorsChanged(object sender, DataErrorsChangedEventArgs e)
         {
-            if (!_propertyErrors.ContainsKey(propertyName))
-            {
-                _propertyErrors.Add(propertyName, new List<string>());
-            }
-
-            _propertyErrors[propertyName].Add(errorMessage);
-
-            OnErrorsChanged(propertyName);
-        }
-
-        private void ClearError(string propertyName)
-        {
-            if (_propertyErrors.ContainsKey(propertyName))
-            {
-                _propertyErrors.Remove(propertyName);
-                OnErrorsChanged(propertyName);
-            }
-        }
-
-        private void OnErrorsChanged(string propertyName)
-        {
-            ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
+            ErrorsChanged?.Invoke(this, e);
         }
     }
 }

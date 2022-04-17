@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using TrackerLibrary;
 using TrackerLibrary.Models;
 using TrackerWPF.Models;
-using TrackerWPF.Services;
 using TrackerWPFUI.Commands;
 using TrackerWPFUI.Stores;
 using TrackerWPFUI.ViewModels.Base;
@@ -32,7 +31,7 @@ namespace TrackerWPFUI.ViewModels
         private string _secondTeamScore;
         private string _firstTeamName;
         private string _secondTeamName;
-        private readonly Dictionary<string, List<string>> _propertyErrors = new Dictionary<string, List<string>>();
+        private readonly ViewModelValidation _viewModelValidation;
 
         public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
 
@@ -42,6 +41,7 @@ namespace TrackerWPFUI.ViewModels
             _modalNavigationStore = modalNavigationStore;
             _dashBoardViewModel = dashBoardViewModel;
             _tournament = tournament;
+            _viewModelValidation = new ViewModelValidation();
 
             LoadRound();
 
@@ -50,10 +50,11 @@ namespace TrackerWPFUI.ViewModels
                 SelectedRoundNumber += 1;
             }
 
-            _tournament.OnTournamentComplete += Tournament_OnTournamentComplete;
-
             CloseCommand = new RelayCommand(Close);
             SaveScoreCommand = new RelayCommand(SaveScore, CanSaveScore);
+
+            _tournament.OnTournamentComplete += Tournament_OnTournamentComplete;
+            _viewModelValidation.ErrorsChanged += ViewModelValidation_ErrorsChanged;
         }
 
         private void Tournament_OnTournamentComplete(object sender, DateTime e)
@@ -148,7 +149,7 @@ namespace TrackerWPFUI.ViewModels
         public RelayCommand CloseCommand { get; set; }
         public RelayCommand SaveScoreCommand { get; set; }
 
-        public bool HasErrors => _propertyErrors.Any();
+        public bool HasErrors => _viewModelValidation.HasErrors;
 
         private void Close(object parameter)
         {
@@ -172,7 +173,6 @@ namespace TrackerWPFUI.ViewModels
 
             return true;
         }
-
         private void SaveScore(object parameter)
         {
             ValidateScore(out double firstTeamScore, out double secondTeamScore);
@@ -196,30 +196,25 @@ namespace TrackerWPFUI.ViewModels
                 SelectedRoundNumber += 1;
             }
         }
-
         private void ValidateScore(out double firstTeamScore, out double secondTeamScore)
         {
-            ClearError(nameof(FirstTeamScore));
-            ClearError(nameof(SecondTeamScore));
+            _viewModelValidation.ClearError(nameof(FirstTeamScore));
+            _viewModelValidation.ClearError(nameof(SecondTeamScore));
 
             if (!double.TryParse(FirstTeamScore, out firstTeamScore))
             {
-                AddError(nameof(FirstTeamScore), "Please Enter a valid score");
-                OnErrorsChanged(nameof(FirstTeamScore));
+                _viewModelValidation.AddError(nameof(FirstTeamScore), "Please Enter a valid score");
             }
 
             if (!double.TryParse(SecondTeamScore, out secondTeamScore))
             {
-                AddError(nameof(SecondTeamScore), "Please Enter a valid score");
-                OnErrorsChanged(nameof(SecondTeamScore));
+                _viewModelValidation.AddError(nameof(SecondTeamScore), "Please Enter a valid score");
             }
 
             if (firstTeamScore == secondTeamScore)
             {
-                AddError(nameof(FirstTeamScore), "Tie game are not allowed");
-                OnErrorsChanged(nameof(FirstTeamScore));
-                AddError(nameof(SecondTeamScore), "Tie game are not allowed");
-                OnErrorsChanged(nameof(SecondTeamScore));
+                _viewModelValidation.AddError(nameof(FirstTeamScore), "Tie game are not allowed");
+                _viewModelValidation.AddError(nameof(SecondTeamScore), "Tie game are not allowed");
             }
         }
 
@@ -286,34 +281,12 @@ namespace TrackerWPFUI.ViewModels
 
         public IEnumerable GetErrors(string propertyName)
         {
-            _propertyErrors.TryGetValue(propertyName, out List<string> output);
-            return output;
+            return _viewModelValidation.GetErrors(propertyName);
         }
 
-        private void AddError(string propertyName, string errorMessage)
+        private void ViewModelValidation_ErrorsChanged(object sender, DataErrorsChangedEventArgs e)
         {
-            if (!_propertyErrors.ContainsKey(propertyName))
-            {
-                _propertyErrors.Add(propertyName, new List<string>());
-            }
-
-            _propertyErrors[propertyName].Add(errorMessage);
-
-            OnErrorsChanged(propertyName);
-        }
-
-        private void ClearError(string propertyName)
-        {
-            if (_propertyErrors.ContainsKey(propertyName))
-            {
-                _propertyErrors.Remove(propertyName);
-                OnErrorsChanged(propertyName);
-            }
-        }
-
-        private void OnErrorsChanged(string propertyName)
-        {
-            ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
+            ErrorsChanged?.Invoke(this, e);
         }
     }
 }
