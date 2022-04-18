@@ -1,0 +1,117 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:TrackerWPFUI.CustomControls">
+
+    <!--#region Window Button Style -->
+    <Style TargetType="{x:Type Button}" x:Key="WindowButton">
+        <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+
+    <Style TargetType="{x:Type Button}" x:Key="WindowControlButton" BasedOn="{StaticResource WindowButton}">
+        <Setter Property="FontSize" Value="20"/>
+        <Setter Property="FontWeight" Value="Light"/>
+        <Setter Property="MinWidth" Value="46"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}">
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{TemplateBinding Content}" Padding="1 -6 1 1"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type Button}" x:Key="TitleBarIcon" BasedOn="{StaticResource WindowButton}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <!--#endregion-->
+
+    <Style TargetType="{x:Type local:CustomWindow}">
+        <Setter Property="AllowsTransparency" Value="True"/>
+        <Setter Property="WindowStyle" Value="None"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:CustomWindow}">
+                    <!--Outer border for drop shadow size-->
+                    <Border x:Name="PART_DropShadowBorder">
+                        <!--Main Window Outline-->
+                        <Grid>
+                            <!--Window border with dropshadow effect-->
+                            <Border x:Name="PART_WindowBorder" Background="{TemplateBinding Background}">
+                                <Border.Effect>
+                                    <DropShadowEffect x:Name="PART_DropShadow"/>
+                                </Border.Effect>
+                            </Border>
+
+                            <!--Main Window-->
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition x:Name="PART_TitleBarHeight"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+
+                                <!--Opacity Mask for Window Top Corner-->
+                                <Border x:Name="PART_TitleBar"/>
+
+                                <!--Title Bar Try PanelZIndel 1-->
+                                <DockPanel Grid.Row="0" LastChildFill="True">
+                                    <DockPanel.OpacityMask>
+                                        <VisualBrush Visual="{Binding ElementName=PART_TitleBar}"/>
+                                    </DockPanel.OpacityMask>
+
+                                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                                        <AdornerDecorator>
+                                            <Button x:Name="PART_MinimizeButton" Content="–" Style="{StaticResource WindowControlButton}"/>
+                                        </AdornerDecorator>
+                                        <AdornerDecorator>
+                                            <Button x:Name="PART_MaximizeButton" Content="□" Style="{StaticResource WindowControlButton}"/>
+                                        </AdornerDecorator>
+                                        <AdornerDecorator>
+                                            <Button x:Name="PART_CloseButton" Content="x" Style="{StaticResource WindowControlButton}"/>
+                                        </AdornerDecorator>
+                                    </StackPanel>
+
+                                    <!--Clickable Icon-->
+                                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                                        <Button x:Name="PART_WindowIconButton" Style="{StaticResource TitleBarIcon}" Command="{Binding WindowMenuCommand}">
+                                            <Button.Background>
+                                                <ImageBrush Stretch="Uniform" 
+                                                            ImageSource="{Binding RelativeSource={RelativeSource AncestorType=local:CustomWindow}, Path=Icon}"/>
+                                            </Button.Background>
+                                        </Button>
+                                        <Viewbox>
+                                            <TextBlock x:Name="PART_Title" Margin="10 0" Text="{TemplateBinding Title}" Padding="2"/>
+                                        </Viewbox>
+                                    </StackPanel>
+                                </DockPanel>
+
+                                <AdornerDecorator Grid.Row="1">
+                                    <ContentPresenter Content="{TemplateBinding Content}"/>
+                                </AdornerDecorator>
+                            </Grid>
+                        </Grid>
+                    </Border>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Icon" Value="{x:Null}">
+                            <Setter TargetName="PART_WindowIconButton" Property="Visibility" Value="Collapsed"/>
+                            <Setter TargetName="PART_Title" Property="Margin" Value="5 0"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

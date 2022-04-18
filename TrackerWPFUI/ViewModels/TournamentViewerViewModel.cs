@@ -35,7 +35,8 @@ namespace TrackerWPFUI.ViewModels
 
         public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
 
-        public TournamentViewerViewModel(NavigationStore navigationStore, ModalNavigationStore modalNavigationStore, DashBoardViewModel dashBoardViewModel, TournamentModel tournament)
+        public TournamentViewerViewModel(NavigationStore navigationStore, ModalNavigationStore modalNavigationStore, DashBoardViewModel dashBoardViewModel,
+            TournamentModel tournament)
         {
             _navigationStore = navigationStore;
             _modalNavigationStore = modalNavigationStore;
