@@ -4,8 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Shell;
-using TrackerWPFUI.Commands;
 using TrackerWPFUI.Stores;
 using TrackerWPFUI.ViewModels.Base;
 

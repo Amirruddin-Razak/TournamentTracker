@@ -97,7 +97,7 @@
                                     </StackPanel>
                                 </DockPanel>
 
-                                <AdornerDecorator Grid.Row="1">
+                                <AdornerDecorator Grid.Row="1" Margin="5">
                                     <ContentPresenter Content="{TemplateBinding Content}"/>
                                 </AdornerDecorator>
                             </Grid>
