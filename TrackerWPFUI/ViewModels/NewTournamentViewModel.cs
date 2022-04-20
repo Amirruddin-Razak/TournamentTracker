@@ -9,7 +9,8 @@ using System.Threading.Tasks;
 using TrackerLibrary;
 using TrackerLibrary.Models;
 using TrackerWPFUI.Commands;
-using TrackerWPFUI.Stores;
+using TrackerWPFUI.Events;
+using TrackerWPFUI.Services;
 using TrackerWPFUI.ViewModels.Base;
 
 namespace TrackerWPFUI.ViewModels
@@ -26,16 +27,14 @@ namespace TrackerWPFUI.ViewModels
         private string _prizePercentage;
         private bool _usePrizeAmount = true;
         private PrizeModel _prizeToDelete;
-        private readonly NavigationStore _navigationStore;
         private readonly ViewModelValidation _viewModelValidation;
-        private readonly DashBoardViewModel _dashBoardViewModel;
+        private readonly INotificationService _notificationService;
 
         public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
 
-        public NewTournamentViewModel(NavigationStore navigationStore, DashBoardViewModel dashBoardViewModel)
+        public NewTournamentViewModel(INotificationService notificationService)
         {
-            _navigationStore = navigationStore;
-            _dashBoardViewModel = dashBoardViewModel;
+            _notificationService = notificationService;
             _viewModelValidation = new ViewModelValidation();
 
             TeamList = new ObservableCollection<TeamModel>(GlobalConfig.connection.GetTeam_All());
@@ -196,7 +195,20 @@ namespace TrackerWPFUI.ViewModels
 
         private void CreateNewTeam(object parameter)
         {
-            _navigationStore.CurrentViewModel = new NewTeamViewModel(_navigationStore, this);
+            _notificationService.Subscribe<CreateTeamCompletedEvent>(this, HandleCreateTeamCompletedEvent);
+            _notificationService.Notify(new CreateTeamEvent());
+        }
+
+        private void HandleCreateTeamCompletedEvent(object parameter)
+        {
+            CreateTeamCompletedEvent message = (CreateTeamCompletedEvent)parameter;
+
+            if (message.Team != null)
+            {
+                EnteredTeam.Add(message.Team);
+            }
+
+            _notificationService.Unsubscribe<CreateTeamCompletedEvent>(this);
         }
 
         private bool CanAddTeam(object parameter) => TeamToAdd != null;
@@ -338,8 +350,7 @@ namespace TrackerWPFUI.ViewModels
 
             TournamentLogic.CreateNewTournament(tournament);
 
-            _dashBoardViewModel.TournamentList.Add(tournament);
-            _navigationStore.CurrentViewModel = _dashBoardViewModel;
+            _notificationService.Notify(new CreateTournamentCompletedEvent(typeof(NewTournamentViewModel), tournament));
         }
         private void ValidateTournament(out decimal entreeFee)
         {
@@ -378,7 +389,7 @@ namespace TrackerWPFUI.ViewModels
 
         private void Cancel(object parameter)
         {
-            _navigationStore.CurrentViewModel = _dashBoardViewModel;
+            _notificationService.Notify(new CreateTournamentCompletedEvent(typeof(NewTournamentViewModel), null));
         }
 
         public IEnumerable GetErrors(string propertyName)

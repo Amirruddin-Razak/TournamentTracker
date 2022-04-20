@@ -10,7 +10,8 @@ using System.Threading.Tasks;
 using TrackerLibrary;
 using TrackerLibrary.Models;
 using TrackerWPFUI.Commands;
-using TrackerWPFUI.Stores;
+using TrackerWPFUI.Events;
+using TrackerWPFUI.Services;
 using TrackerWPFUI.ViewModels.Base;
 
 namespace TrackerWPFUI.ViewModels
@@ -24,16 +25,14 @@ namespace TrackerWPFUI.ViewModels
         private string _lastName;
         private string _phoneNumber;
         private string _emailAddress;
-        private readonly NewTournamentViewModel _newTournamentViewModel;
-        private readonly NavigationStore _navigationStore;
+        private readonly INotificationService _notificationService;
         private readonly ViewModelValidation _viewModelValidation;
 
         public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
 
-        public NewTeamViewModel(NavigationStore navigationStore, NewTournamentViewModel newTournamentViewModel)
+        public NewTeamViewModel(INotificationService notificationService)
         {
-            _newTournamentViewModel = newTournamentViewModel;
-            _navigationStore = navigationStore;
+            _notificationService = notificationService;
             _viewModelValidation = new ViewModelValidation();
 
             PlayerList = new ObservableCollection<PersonModel>(GlobalConfig.connection.GetPerson_All());
@@ -134,7 +133,7 @@ namespace TrackerWPFUI.ViewModels
 
         private void Cancel(object parameter)
         {
-            _navigationStore.CurrentViewModel = _newTournamentViewModel;
+            _notificationService.Notify(new CreateTeamCompletedEvent(typeof(NewTeamViewModel), null));
         }
 
         private bool CanRemoveMember(object parameter) => SelectedMember != null;
@@ -243,9 +242,7 @@ namespace TrackerWPFUI.ViewModels
 
             GlobalConfig.connection.SaveNewTeam(team);
 
-            _newTournamentViewModel.EnteredTeam.Add(team);
-
-            _navigationStore.CurrentViewModel = _newTournamentViewModel;
+            _notificationService.Notify(new CreateTeamCompletedEvent(typeof(NewTeamViewModel), team));
         }
         private void ValidateTeam()
         {

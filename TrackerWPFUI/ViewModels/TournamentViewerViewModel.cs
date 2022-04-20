@@ -10,7 +10,8 @@ using TrackerLibrary;
 using TrackerLibrary.Models;
 using TrackerWPF.Models;
 using TrackerWPFUI.Commands;
-using TrackerWPFUI.Stores;
+using TrackerWPFUI.Events;
+using TrackerWPFUI.Services;
 using TrackerWPFUI.ViewModels.Base;
 
 namespace TrackerWPFUI.ViewModels
@@ -20,10 +21,8 @@ namespace TrackerWPFUI.ViewModels
         private const string _bye = "--- byes ---";
         private const string _notYetSet = "Not Yet Determined";
 
-        private readonly NavigationStore _navigationStore;
-        private readonly ModalNavigationStore _modalNavigationStore;
-        private readonly DashBoardViewModel _dashBoardViewModel;
-        private readonly TournamentModel _tournament;
+        private readonly INotificationService _notificationService;
+        private TournamentModel _tournament;
         private int _selectedRoundNumber = 1;
         private bool _upcomingMatchOnly = true;
         private MatchupDisplayModel _selectedMatchup;
@@ -35,12 +34,9 @@ namespace TrackerWPFUI.ViewModels
 
         public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
 
-        public TournamentViewerViewModel(NavigationStore navigationStore, ModalNavigationStore modalNavigationStore, DashBoardViewModel dashBoardViewModel,
-            TournamentModel tournament)
+        public TournamentViewerViewModel(INotificationService notificationService, TournamentModel tournament)
         {
-            _navigationStore = navigationStore;
-            _modalNavigationStore = modalNavigationStore;
-            _dashBoardViewModel = dashBoardViewModel;
+            _notificationService = notificationService;
             _tournament = tournament;
             _viewModelValidation = new ViewModelValidation();
 
@@ -51,10 +47,12 @@ namespace TrackerWPFUI.ViewModels
                 SelectedRoundNumber += 1;
             }
 
+            _tournament.OnTournamentComplete += Tournament_OnTournamentComplete;
+
             CloseCommand = new RelayCommand(Close);
             SaveScoreCommand = new RelayCommand(SaveScore, CanSaveScore);
 
-            _tournament.OnTournamentComplete += Tournament_OnTournamentComplete;
+
             _viewModelValidation.ErrorsChanged += ViewModelValidation_ErrorsChanged;
         }
 
@@ -64,10 +62,9 @@ namespace TrackerWPFUI.ViewModels
 
             string header = "Tournament Ended";
             string message = $"Team { winner } has won the tournament";
-            _modalNavigationStore.CurrentViewModel = new StatusInfoViewModel(header, message, _modalNavigationStore);
 
-            _dashBoardViewModel.TournamentList.Remove(_tournament);
-            Close(null);
+            _notificationService.Notify(new ViewTournamentEndedEvent(typeof(TournamentViewerViewModel), new StatusInfoViewModel(header, message, _notificationService),
+                _tournament));
         }
 
 
@@ -79,6 +76,7 @@ namespace TrackerWPFUI.ViewModels
             set
             {
                 _selectedRoundNumber = value;
+                OnPropertyChanged(nameof(SelectedRoundNumber));
                 LoadRound();
             }
         }
@@ -154,7 +152,7 @@ namespace TrackerWPFUI.ViewModels
 
         private void Close(object parameter)
         {
-            _navigationStore.CurrentViewModel = _dashBoardViewModel;
+            _notificationService.Notify(new ViewTournamentEndedEvent(typeof(TournamentViewerViewModel), null, null));
         }
 
         private bool CanSaveScore(object parameter)

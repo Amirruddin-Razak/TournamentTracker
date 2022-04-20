@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 using TrackerLibrary;
 using TrackerLibrary.Models;
 using TrackerWPFUI.Commands;
-using TrackerWPFUI.Stores;
+using TrackerWPFUI.Events;
+using TrackerWPFUI.Services;
 using TrackerWPFUI.ViewModels.Base;
 
 namespace TrackerWPFUI.ViewModels
@@ -15,13 +16,11 @@ namespace TrackerWPFUI.ViewModels
     public class DashBoardViewModel : ViewModelBase
     {
         private TournamentModel _selectedTournament;
-        private readonly NavigationStore _navigationStore;
-        private readonly ModalNavigationStore _modalNavigationStore;
+        private readonly INotificationService _notificationService;
 
-        public DashBoardViewModel(NavigationStore navigationStore, ModalNavigationStore modalNavigationStore)
+        public DashBoardViewModel(INotificationService notificationService)
         {
-            _navigationStore = navigationStore;
-            _modalNavigationStore = modalNavigationStore;
+            _notificationService = notificationService;
             TournamentList = new ObservableCollection<TournamentModel>(GlobalConfig.connection.GetTournament_All().FindAll(x => x.Active));
 
             CreateTournamentCommand = new RelayCommand(CreateTournament);
@@ -45,14 +44,41 @@ namespace TrackerWPFUI.ViewModels
 
         public void CreateTournament(object parameter)
         {
-            _navigationStore.CurrentViewModel = new NewTournamentViewModel(_navigationStore, this);
+            _notificationService.Subscribe<CreateTournamentCompletedEvent>(this, HandleCreateTournamentCompletedEvent);
+            _notificationService.Notify(new CreateTournamentEvent());
+        }
+
+        private void HandleCreateTournamentCompletedEvent(object parameter)
+        {
+            CreateTournamentCompletedEvent message = (CreateTournamentCompletedEvent)parameter;
+
+            if (message.Tournament != null)
+            {
+                TournamentList.Add(message.Tournament);
+            }
+
+            _notificationService.Unsubscribe<CreateTournamentCompletedEvent>(this);
         }
 
         public bool CanViewTournament(object parameter) => SelectedTournament != null;
 
         public void ViewTournament(object parameter)
         {
-            _navigationStore.CurrentViewModel = new TournamentViewerViewModel(_navigationStore, _modalNavigationStore, this, SelectedTournament);
+            _notificationService.Subscribe<ViewTournamentEndedEvent>(this, HandleViewTournamentEndedEvent);
+            _notificationService.Notify(new ViewTournamentEvent());
+        }
+
+        private void HandleViewTournamentEndedEvent(object parameter)
+        {
+            ViewTournamentEndedEvent message = (ViewTournamentEndedEvent)parameter;
+
+            if (message.EndedTournament != null)
+            {
+                TournamentList.Remove(message.EndedTournament);
+                SelectedTournament = null;
+            }
+
+            _notificationService.Unsubscribe<ViewTournamentEndedEvent>(this);
         }
     }
 }

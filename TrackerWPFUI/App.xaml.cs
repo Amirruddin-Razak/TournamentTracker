@@ -10,10 +10,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using TrackerLibrary;
-using TrackerWPFUI.Stores;
+using TrackerWPFUI.Services;
 using TrackerWPFUI.ViewModels;
 using TrackerWPFUI.ViewModels.Base;
-using TrackerWPFUI.Views;
 
 namespace TrackerWPFUI
 {
@@ -28,21 +27,15 @@ namespace TrackerWPFUI
         {
             IServiceCollection services = new ServiceCollection();
 
-            services.AddSingleton<NavigationStore>();
-            services.AddSingleton<ModalNavigationStore>();
+            services.AddSingleton<INotificationService, NotificationService>();
             services.AddSingleton<MainWindow>();
-            services.AddSingleton(s => new MainViewModel
-            (
-                s.GetRequiredService<NavigationStore>(),
-                s.GetRequiredService<ModalNavigationStore>()
-            ));
+            services.AddSingleton(s => new DashBoardViewModel(s.GetRequiredService<INotificationService>()));
 
             services.AddTransient<ViewModelValidation>();
-            services.AddTransient(s => new DashBoardViewModel
-            (
-                s.GetRequiredService<NavigationStore>(),
-                s.GetRequiredService<ModalNavigationStore>()
-            ));
+            services.AddTransient(s => new NewTournamentViewModel(s.GetRequiredService<INotificationService>()));
+            services.AddTransient(s => new NewTeamViewModel(s.GetRequiredService<INotificationService>()));
+            services.AddTransient(s => new TournamentViewerViewModel(s.GetRequiredService<INotificationService>(),
+                s.GetRequiredService<DashBoardViewModel>().SelectedTournament));
 
             _serviceProvider = services.BuildServiceProvider();
         }
@@ -51,10 +44,9 @@ namespace TrackerWPFUI
         {
             GlobalConfig.InitiallizeConnection(DatabaseType.TextFile, InitializeConfiguration());
 
-            _serviceProvider.GetRequiredService<NavigationStore>().CurrentViewModel = _serviceProvider.GetRequiredService<DashBoardViewModel>();
-
             MainWindow = _serviceProvider.GetRequiredService<MainWindow>();
-            MainWindow.DataContext = _serviceProvider.GetRequiredService<MainViewModel>();
+
+            MainWindow.DataContext = new MainViewModel(_serviceProvider, _serviceProvider.GetRequiredService<INotificationService>());
             MainWindow.Show();
 
             base.OnStartup(e);

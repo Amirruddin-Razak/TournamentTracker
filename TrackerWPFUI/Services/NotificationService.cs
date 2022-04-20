@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace TrackerWPFUI.Services
 {
-    public class NotificationService
+    public class NotificationService : INotificationService
     {
         private ConcurrentDictionary<Type, ConcurrentDictionary<object, Action<object>>> _subscriptions = new
             ConcurrentDictionary<Type, ConcurrentDictionary<object, Action<object>>>();

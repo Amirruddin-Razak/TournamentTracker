@@ -4,24 +4,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using TrackerWPF.Services;
+using TrackerWPFUI.Services;
 using TrackerWPFUI.Commands;
-using TrackerWPFUI.Stores;
 using TrackerWPFUI.ViewModels.Base;
+using TrackerWPFUI.Events;
 
 namespace TrackerWPFUI.ViewModels
 {
     public class StatusInfoViewModel : ViewModelBase
     {
-        private readonly ModalNavigationStore _modalNavigationStore;
+        private readonly INotificationService _notificationService;
         private string _message;
         private string _header;
 
-        public StatusInfoViewModel(string header, string message, ModalNavigationStore modalNavigationStore)
+        public StatusInfoViewModel(string header, string message, INotificationService notificationService)
         {
             Header = header;
             Message = message;
-            _modalNavigationStore = modalNavigationStore;
+            _notificationService = notificationService;
             CloseCommand = new RelayCommand(Close);
         }
 
@@ -49,7 +49,7 @@ namespace TrackerWPFUI.ViewModels
 
         private void Close(object parameter)
         {
-            _modalNavigationStore.CurrentViewModel = null;
+            _notificationService.Notify(new CloseModalEvent());
         }
     }
 }
