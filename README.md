@@ -1,5 +1,5 @@
 # Tournament Tracker  
-Tournament Tracker is a desktop application that use WinForm UI.  
+Tournament Tracker is a desktop application that has both WinForm UI and a WPF UI.  
 This application allow user to create and a manage an elimination-style tournament. This application offer the following:  
 1. Set Entree Fee and Prizes. Total Prize must be lower than total collected fees.  
 2. Choosing between high-score or low-score win.  
@@ -12,7 +12,7 @@ This application allow user to create and a manage an elimination-style tourname
 1. Clone the code and open with visual studio.  
 2. On Solution Explorer, Right-Click on TrackerData Project and Publish the database to MSSQLLocalDB and use window authentication.  
 3. On SQL Server Object Explorer, locate and double-click on the published database. After that, right-click on the database and select properties. Copy the connection string.  
-4. On Solution Explorer, Open TrackerWinFormUI Project, Open App.config and replace the connection string.  
+4. On Solution Explorer, Open TrackerWinFormUI or TrackerWPFUI depending on which UI you prefer, Open App.config and replace the connection string.  
 5. In App.config:  
   1. filePath is for defining the path the save the CSV data (if used). 
   2. highScoreWin is a flag to decide whether system should consider team with higher score as the winner or use lower score instead.   
@@ -23,4 +23,4 @@ This application allow user to create and a manage an elimination-style tourname
 
 ## Credits
 The original project use .Net Framework 4.5 with WinForm UI up to this [commit](https://github.com/Amirruddin-Razak/TournamentTracker/tree/ea4a84fdc012ecccd09849de6e30b42eccd68792) is made by referring to [IAmTimCorey Project Series](https://www.youtube.com/watch?v=HalXZUHfKLA&list=PLLWMQd6PeGY3t63w-8MMIjIyYS7MsFcCi).
-All subsequence improvement afterwards are my personal work.
+All subsequence improvement including upgrade to .NET Core and add on WPF UI are my personal work.
