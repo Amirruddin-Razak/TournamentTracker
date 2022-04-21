@@ -30,28 +30,8 @@ namespace TrackerLibrary
             }
         }
 
-        public static string GetCnnString(string name)
-        {
-            if (_config == null)
-            {
-                return ConfigurationManager.ConnectionStrings[name].ConnectionString;
-            }
-            else
-            {
-                return _config.GetConnectionString(name);
-            }
-        }
+        public static string GetCnnString(string name) => _config.GetConnectionString(name);
 
-        public static string AppKeyLookup(string key)
-        {
-            if (_config == null)
-            {
-                return ConfigurationManager.AppSettings[key];
-            }
-            else
-            {
-                return _config.GetSection("appSettings")[key];
-            }
-        }
+        public static string AppKeyLookup(string key) => _config.GetSection("appSettings")[key];
     }
 }
