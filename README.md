@@ -12,12 +12,13 @@ This application allow user to create and a manage an elimination-style tourname
 1. Clone the code and open with visual studio.  
 2. On Solution Explorer, Right-Click on TrackerData Project and Publish the database to MSSQLLocalDB and use window authentication.  
 3. On SQL Server Object Explorer, locate and double-click on the published database. After that, right-click on the database and select properties. Copy the connection string.  
-4. On Solution Explorer, Open TrackerWinFormUI or TrackerWPFUI depending on which UI you prefer, Open App.config and replace the connection string.  
-5. In App.config:  
-  1. filePath is for defining the path the save the CSV data (if used). 
-  2. highScoreWin is a flag to decide whether system should consider team with higher score as the winner or use lower score instead.   
-  3. Sender Email and Sender Name is for email notification system.  
-  4. MailSettings section define the email sending method. default setting is using localhost.  
+4. On Solution Explorer, Open TrackerWinFormUI or TrackerWPFUI depending on which UI you prefer, Open appsettings.json file.    
+5. In appsettings.json:  
+  1. Replace the ConnectionStrings with the connection string you copied earlier.  
+  2. filePath is for defining the path the save the CSV data (if used). 
+  3. highScoreWin is a flag to decide whether system should consider team with higher score as the winner or use lower score instead.   
+  4. Sender Email and Sender Name is for email notification system.  
+  5. MailSettings section define the email sending method. default setting is using localhost.  
 6. In Program.cs, line 'GlobalConfig.InitiallizeConnection(DatabaseType.Sql);' define whether the app will use SQL server or CSV file as database
 7. Build and enjoy
 
