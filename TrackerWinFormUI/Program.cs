@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using System;
+using System.IO;
 using System.Windows.Forms;
 using TrackerLibrary;
 
@@ -15,8 +17,17 @@ namespace TrackerWinFormUI
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            GlobalConfig.InitiallizeConnection(DatabaseType.Sql, null);
+            GlobalConfig.InitiallizeConnection(DatabaseType.TextFile, InitializeConfiguration());
             Application.Run(new DashboardForm());
+        }
+
+        private static IConfiguration InitializeConfiguration()
+        {
+            IConfigurationBuilder builder = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json");
+
+            return builder.Build();
         }
     }
 }

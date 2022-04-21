@@ -9,7 +9,7 @@ namespace TrackerWinFormUI
 {
     public partial class DashboardForm : Form, ITournamentRequestor
     {
-        private BindingList<TournamentModel> tournaments = new BindingList<TournamentModel>();
+        private BindingList<TournamentModel> _tournaments = new BindingList<TournamentModel>();
 
         public DashboardForm()
         {
@@ -20,8 +20,8 @@ namespace TrackerWinFormUI
 
         private void InitializeFormData()
         {
-            tournaments = new BindingList<TournamentModel>(GlobalConfig.connection.GetTournament_All().FindAll(x => x.Active));
-            tournamentListBox.DataSource = tournaments;
+            _tournaments = new BindingList<TournamentModel>(GlobalConfig.connection.GetTournament_All().FindAll(x => x.Active));
+            tournamentListBox.DataSource = _tournaments;
             tournamentListBox.DisplayMember = "TournamentName";
         }
 
@@ -36,7 +36,7 @@ namespace TrackerWinFormUI
 
         public void NewTournamentComplete(TournamentModel tournament)
         {
-            tournaments.Add(tournament);
+            _tournaments.Add(tournament);
 
             WindowState = FormWindowState.Normal;
             ShowInTaskbar = true;
@@ -44,7 +44,13 @@ namespace TrackerWinFormUI
 
         private void ViewTournamentButton_Click(object sender, EventArgs e)
         {
-            TournamentModel tournament = (TournamentModel)tournamentListBox.SelectedItem;
+            TournamentModel tournament = (TournamentModel)tournamentListBox?.SelectedItem;
+
+            if (tournament == null)
+            {
+                MessageBox.Show("Please select a tournament to view", "Error");
+                return;
+            }
 
             tournament.OnTournamentComplete += Tournament_OnTournamentComplete;
 
