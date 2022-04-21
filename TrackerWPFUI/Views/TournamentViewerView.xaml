@@ -5,8 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:TrackerWPFUI.Views"
              xmlns:viewmodels="clr-namespace:TrackerWPFUI.ViewModels" d:DataContext="{d:DesignInstance Type=viewmodels:TournamentViewerViewModel}"
-             mc:Ignorable="d" FontSize="18"
-             d:DesignHeight="700" d:DesignWidth="1000">
+             mc:Ignorable="d" FontSize="18" ClipToBounds="True"
+             d:DesignHeight="700" d:DesignWidth="1000" >
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
@@ -26,13 +26,21 @@
         </Grid.ColumnDefinitions>
 
         <!-- Page Title -->
-        <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="1"
-                    Grid.ColumnSpan="3" Margin="20 5 20 20" HorizontalAlignment="Center">
-            <TextBlock Text="Tournament : " FontSize="36" FontWeight="Bold"/>
-            <TextBlock Text="{Binding TournamentName}" FontSize="36" FontWeight="Bold"/>
-        </StackPanel>
+        <Grid Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" Margin="20 5 20 20"
+              HorizontalAlignment="Center"
+              MaxWidth="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=ActualWidth}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="Tournament : " FontSize="36"
+                       FontWeight="Bold"/>
+            <TextBlock Grid.Column="1" Text="{Binding TournamentName}" FontSize="36"
+                       FontWeight="Bold" TextWrapping="Wrap"/>
+        </Grid>
 
-        <!-- Column 1 -->
+
+            <!-- Column 1 -->
         <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1" Margin="0 15">
             <TextBlock Text="Round : "/>
             <ComboBox ItemsSource="{Binding RoundList}" SelectedItem="{Binding SelectedRoundNumber}"

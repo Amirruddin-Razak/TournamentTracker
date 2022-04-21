@@ -34,7 +34,9 @@
             <ContentControl Content="{Binding CurrentModalViewModel}"/>
         </custom:Modal>
 
-        <ContentControl Content="{Binding CurrentViewModel}"/>
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <ContentControl Content="{Binding CurrentViewModel}"/>
+        </ScrollViewer>
     </Grid>
 
 
