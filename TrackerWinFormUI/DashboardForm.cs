@@ -1,33 +1,47 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Windows.Forms;
-using TrackerLibrary;
-using TrackerLibrary.Models;
+using TrackerUI.Library.Api;
+using TrackerUI.Library.Api.Helper;
+using TrackerUI.Library.Models;
 using TrackerWinFormUI.Interface;
 
 namespace TrackerWinFormUI
 {
     public partial class DashboardForm : Form, ITournamentRequestor
     {
-        private BindingList<TournamentModel> _tournaments = new BindingList<TournamentModel>();
+        private BindingList<TournamentModel> _tournaments = new();
+        private readonly IApiConnector _apiConnector;
+        private readonly ITournamentEndpoint _tournamentEndpoint;
 
-        public DashboardForm()
+        public DashboardForm(IApiConnector apiConnector)
         {
             InitializeComponent();
+
+            _apiConnector = apiConnector;
+            _tournamentEndpoint = new TournamentEndpoint(apiConnector);
 
             InitializeFormData();
         }
 
-        private void InitializeFormData()
+        private async void InitializeFormData()
         {
-            _tournaments = new BindingList<TournamentModel>(GlobalConfig.connection.GetTournament_All().FindAll(x => x.Active));
-            tournamentListBox.DataSource = _tournaments;
-            tournamentListBox.DisplayMember = "TournamentName";
+            try
+            {
+                var result = await _tournamentEndpoint.GetActiveTournamentAsync();
+                _tournaments = new BindingList<TournamentModel>(result);
+                tournamentListBox.DataSource = _tournaments;
+                tournamentListBox.DisplayMember = "TournamentName";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Unexpected error occurs. Please try again later");
+            }
         }
 
         private void CreateTournamentButton_Click(object sender, EventArgs e)
         {
-            NewTournamentForm frm = new NewTournamentForm(this);
+            NewTournamentForm frm = new(this);
             frm.Show();
 
             WindowState = FormWindowState.Minimized;
@@ -54,7 +68,7 @@ namespace TrackerWinFormUI
 
             tournament.OnTournamentComplete += Tournament_OnTournamentComplete;
 
-            TournamentViewerForm frm = new TournamentViewerForm(tournament, this);
+            TournamentViewerForm frm = new(tournament, this, _apiConnector);
             frm.Show();
 
             WindowState = FormWindowState.Minimized;

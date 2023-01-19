@@ -202,7 +202,7 @@ namespace TrackerWinFormUI
 
             TournamentLogic.CreateNewTournament(tournament);
 
-            callingForm.NewTournamentComplete(tournament);
+            callingForm.NewTournamentComplete(new TrackerUI.Library.Models.TournamentModel(tournament));
 
             Close();
         }

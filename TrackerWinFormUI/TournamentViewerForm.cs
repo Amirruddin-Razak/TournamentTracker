@@ -4,33 +4,36 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows.Forms;
 using TrackerLibrary;
-using TrackerLibrary.Models;
+using TrackerUI.Library.Api;
+using TrackerUI.Library.Api.Helper;
+using TrackerUI.Library.Models;
 using TrackerWinFormUI.Interface;
 
 namespace TrackerWinFormUI
 {
     public partial class TournamentViewerForm : Form
     {
-        private TournamentModel tournament;
-        private BindingList<int> roundNumber = new BindingList<int>();
-        private BindingList<MatchupModel> round = new BindingList<MatchupModel>();
-        private DashboardForm _caller;
+        private readonly TournamentModel _tournament;
+        private readonly BindingList<int> _roundNumber = new();
+        private readonly BindingList<MatchupModel> _round = new();
+        private readonly DashboardForm _caller;
+        private readonly ITournamentEndpoint _tournamentEndpoint;
 
-        public TournamentViewerForm(TournamentModel tournamentModel, DashboardForm callingForm)
+        public TournamentViewerForm(TournamentModel tournamentModel, DashboardForm callingForm, IApiConnector apiConnector)
         {
             InitializeComponent();
 
-            tournament = tournamentModel;
+            _tournament = tournamentModel;
             _caller = callingForm;
-
-            tournament.OnTournamentComplete += Tournament_OnTournamentComplete;
+            _tournamentEndpoint = new TournamentEndpoint(apiConnector);
+            _tournament.OnTournamentComplete += Tournament_OnTournamentComplete;
 
             InitializeFormData();
         }
 
         private void Tournament_OnTournamentComplete(object sender, DateTime e)
         {
-            string winner = tournament.Rounds.Find(x => x.First().MatchupRound == roundNumber.Last()).First().Winner.TeamName;
+            string winner = _tournament.Rounds.Find(x => x.First().MatchupRound == _roundNumber.Last()).First().Winner.TeamName;
             MessageBox.Show($"Tournament has ended, The winner is { winner }");
 
             Close();
@@ -38,16 +41,16 @@ namespace TrackerWinFormUI
 
         private void InitializeFormData() 
         {
-            tournamentNameLabel.Text = tournament.TournamentName;
+            tournamentNameLabel.Text = _tournament.TournamentName;
 
             LoadRoundNumber();
 
-            roundDropDown.DataSource = roundNumber;
+            roundDropDown.DataSource = _roundNumber;
 
-            matchupListBox.DataSource = round;
+            matchupListBox.DataSource = _round;
             matchupListBox.DisplayMember = "DisplayName";
 
-            while (round.Count == 0 && ((int)roundDropDown.SelectedItem != roundNumber.Last()))
+            while (_round.Count == 0 && ((int)roundDropDown.SelectedItem != _roundNumber.Last()))
             {
                 roundDropDown.SelectedIndex += 1;
             }
@@ -55,9 +58,9 @@ namespace TrackerWinFormUI
 
         private void LoadRoundNumber()
         {
-            for (int i = 0; i < tournament.Rounds.Count; i++)
+            for (int i = 0; i < _tournament.Rounds.Count; i++)
             {
-                roundNumber.Add(i + 1);
+                _roundNumber.Add(i + 1);
             }
         }
 
@@ -68,9 +71,9 @@ namespace TrackerWinFormUI
 
         private void LoadMatchupList(int selectedRoundNumber) 
         {
-            round.Clear();
+            _round.Clear();
 
-            foreach (List<MatchupModel> matchups in tournament.Rounds)
+            foreach (List<MatchupModel> matchups in _tournament.Rounds)
             {
                 if (matchups.First().MatchupRound == selectedRoundNumber)
                 {
@@ -78,7 +81,7 @@ namespace TrackerWinFormUI
                     {
                         if (m.Winner == null || !upcomingMatchOnlyCheckBox.Checked)
                         {
-                            round.Add(m);
+                            _round.Add(m);
                         }
                     }
                 }
@@ -157,7 +160,7 @@ namespace TrackerWinFormUI
             DisplayMatchupDetail();
         }
 
-        private void SaveScoreButton_Click(object sender, EventArgs e)
+        private async void SaveScoreButton_Click(object sender, EventArgs e)
         {
             MatchupModel selectedMatchup = (MatchupModel)matchupListBox.SelectedItem;
 
@@ -178,8 +181,7 @@ namespace TrackerWinFormUI
 
             try
             {
-                TournamentLogic.UpdateTournamentResult(tournament);
-
+                await _tournamentEndpoint.UpdateTournamentResultAsync(_tournament);
             }
             catch (Exception ex)
             {
@@ -188,7 +190,7 @@ namespace TrackerWinFormUI
 
             LoadMatchupList((int)roundDropDown.SelectedItem);
 
-            if (round.Count == 0 && ((int)roundDropDown.SelectedItem != roundNumber.Last()))
+            if (_round.Count == 0 && ((int)roundDropDown.SelectedItem != _roundNumber.Last()))
             {
                 roundDropDown.SelectedIndex += 1;
             }
