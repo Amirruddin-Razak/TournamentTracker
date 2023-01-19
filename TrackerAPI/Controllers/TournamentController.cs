@@ -20,4 +20,10 @@ public class TournamentController : ControllerBase
     {
         TournamentLogic.UpdateTournamentResult(tournament);
     }
+
+    [HttpPost]
+    public void CreateTournament(TournamentModel tournament)
+    {
+        TournamentLogic.CreateNewTournament(tournament);
+    }
 }

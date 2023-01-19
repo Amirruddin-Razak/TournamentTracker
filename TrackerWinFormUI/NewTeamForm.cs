@@ -164,7 +164,7 @@ namespace TrackerWinFormUI
             };
 
             GlobalConfig.connection.SaveNewTeam(team);
-            callingForm.NewTeamComplete(team);
+            callingForm.NewTeamComplete(new TrackerUI.Library.Models.TeamModel(team));
 
             Close();
         }

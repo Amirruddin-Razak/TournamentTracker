@@ -41,7 +41,7 @@ namespace TrackerWinFormUI
 
         private void CreateTournamentButton_Click(object sender, EventArgs e)
         {
-            NewTournamentForm frm = new(this);
+            var frm = new NewTournamentForm(this, _apiConnector);
             frm.Show();
 
             WindowState = FormWindowState.Minimized;
@@ -68,7 +68,7 @@ namespace TrackerWinFormUI
 
             tournament.OnTournamentComplete += Tournament_OnTournamentComplete;
 
-            TournamentViewerForm frm = new(tournament, this, _apiConnector);
+            var frm = new TournamentViewerForm(tournament, this, _apiConnector);
             frm.Show();
 
             WindowState = FormWindowState.Minimized;

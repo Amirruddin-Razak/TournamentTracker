@@ -6,4 +6,5 @@ public interface ITournamentEndpoint
 {
     Task<List<TournamentModel>> GetActiveTournamentAsync();
     Task UpdateTournamentResultAsync(TournamentModel tournament);
+    Task CreateTournamentAsync(TournamentModel tournament);
 }

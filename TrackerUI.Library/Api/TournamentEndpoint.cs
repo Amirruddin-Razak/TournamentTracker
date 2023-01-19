@@ -57,5 +57,22 @@ public class TournamentEndpoint : ITournamentEndpoint
             throw;
         }
     }
-    
+
+    public async Task CreateTournamentAsync(TournamentModel tournament)
+    {
+        try
+        {
+            using HttpResponseMessage response = await _apiConnector.ApiClient.PostAsJsonAsync("Tournament/CreateTournament", tournament);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception(response.ReasonPhrase);
+            }
+        }
+        catch (Exception ex)
+        {
+            // TODO add log
+            throw;
+        }
+    }
 }

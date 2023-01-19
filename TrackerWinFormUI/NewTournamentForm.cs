@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
@@ -7,36 +6,55 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using TrackerLibrary;
-using TrackerLibrary.Models;
+using TrackerUI.Library.Api;
+using TrackerUI.Library.Api.Helper;
+using TrackerUI.Library.Models;
 using TrackerWinFormUI.Interface;
 
 namespace TrackerWinFormUI
 {
     public partial class NewTournamentForm : Form, ITeamRequestor
     {
-        private BindingList<TeamModel> availableTeams = new BindingList<TeamModel>(GlobalConfig.connection.GetTeam_All());
-        private BindingList<TeamModel> selectedTeams = new BindingList<TeamModel>();
-        private BindingList<PrizeModel> selectedPrizes = new BindingList<PrizeModel>();
-        private ITournamentRequestor callingForm;
+        private BindingList<TeamModel> _availableTeams;
+        private readonly BindingList<TeamModel> _selectedTeams = new();
+        private readonly BindingList<PrizeModel> _selectedPrizes = new();
+        private readonly ITournamentRequestor _callingForm;
+        private readonly IApiConnector _apiConnector;
+        private readonly ITournamentEndpoint _tournamentEndpoint;
+        private readonly ITeamEndpoint _teamEndpoint;
 
-        public NewTournamentForm(ITournamentRequestor caller)
+        public NewTournamentForm(ITournamentRequestor caller, IApiConnector apiConnector)
         {
             InitializeComponent();
-            callingForm = caller;
-
+            _callingForm = caller;
+            _apiConnector = apiConnector;
+            _tournamentEndpoint = new TournamentEndpoint(apiConnector);
+            _teamEndpoint = new TeamEndpoint(apiConnector);
             InitializeFormData();
+        }
+
+        private async void NewTournamentForm_Load(object sender, EventArgs e)
+        {
+            try
+            {
+                var result = await _teamEndpoint.GetAllTeamAsync();
+                _availableTeams = new BindingList<TeamModel>(result);
+
+                teamComboBox.DataSource = _availableTeams;
+                teamComboBox.DisplayMember = "TeamName";
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Fail to load available team list.");
+            }
         }
 
         private void InitializeFormData()
         {
-            teamComboBox.DataSource = availableTeams;
-            teamComboBox.DisplayMember = "TeamName";
-
-            teamListBox.DataSource = selectedTeams;
+            teamListBox.DataSource = _selectedTeams;
             teamListBox.DisplayMember = "TeamName";
 
-            prizeListBox.DataSource = selectedPrizes;
+            prizeListBox.DataSource = _selectedPrizes;
             prizeListBox.DisplayMember = "PrizeName";
         }
 
@@ -49,10 +67,9 @@ namespace TrackerWinFormUI
                 return;
             }
 
-            PrizeModel prize = new PrizeModel(prizeNameTextBox.Text, prizePlaceNumberTextBox.Text, usePrizeAmount,
-                    prizeValueTextBox.Text);
+            var prize = new PrizeModel(prizeNameTextBox.Text, prizePlaceNumberTextBox.Text, usePrizeAmount, prizeValueTextBox.Text);
 
-            selectedPrizes.Add(prize);
+            _selectedPrizes.Add(prize);
 
             prizeNameTextBox.Clear();
             prizePlaceNumberTextBox.Clear();
@@ -145,8 +162,8 @@ namespace TrackerWinFormUI
             if (teamComboBox.SelectedItem != null)
             {
                 TeamModel team = (TeamModel)teamComboBox.SelectedItem;
-                selectedTeams.Add(team);
-                availableTeams.Remove(team);
+                _selectedTeams.Add(team);
+                _availableTeams.Remove(team);
             }
             else
             {
@@ -159,8 +176,8 @@ namespace TrackerWinFormUI
             if (teamListBox.SelectedItem != null)
             {
                 TeamModel team = (TeamModel)teamListBox.SelectedItem;
-                selectedTeams.Remove(team);
-                availableTeams.Add(team);
+                _selectedTeams.Remove(team);
+                _availableTeams.Add(team);
             }
             else
             {
@@ -172,7 +189,7 @@ namespace TrackerWinFormUI
         {
             if (prizeListBox.SelectedItem != null)
             {
-                selectedPrizes.Remove((PrizeModel)prizeListBox.SelectedItem);
+                _selectedPrizes.Remove((PrizeModel)prizeListBox.SelectedItem);
             }
             else
             {
@@ -182,7 +199,7 @@ namespace TrackerWinFormUI
 
         public void NewTeamComplete(TeamModel team)
         {
-            selectedTeams.Add(team);
+            _selectedTeams.Add(team);
         }
 
         private void CreateTournamentButton_Click(object sender, EventArgs e)
@@ -192,17 +209,24 @@ namespace TrackerWinFormUI
                 return;
             }
 
-            TournamentModel tournament = new TournamentModel()
+            TournamentModel tournament = new()
             {
                 TournamentName = tournamentNameTextBox.Text,
                 EntreeFee = decimal.Parse(entreeFeeTextBox.Text),
-                TeamList = selectedTeams.ToList(),
-                Prizes = selectedPrizes.ToList()
+                TeamList = _selectedTeams.ToList(),
+                Prizes = _selectedPrizes.ToList()
             };
 
-            TournamentLogic.CreateNewTournament(tournament);
+            try
+            {
+                _tournamentEndpoint.CreateTournamentAsync(tournament);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to create tournament. System encounter the following error: {ex.Message}");
+            }
 
-            callingForm.NewTournamentComplete(new TrackerUI.Library.Models.TournamentModel(tournament));
+            _callingForm.NewTournamentComplete(tournament);
 
             Close();
         }
@@ -233,9 +257,9 @@ namespace TrackerWinFormUI
             else
             {
                 decimal totalPrize = 0;
-                decimal totalFees = decimal.Multiply(entreeFee, selectedTeams.Count);
+                decimal totalFees = decimal.Multiply(entreeFee, _selectedTeams.Count);
 
-                foreach (PrizeModel p in selectedPrizes)
+                foreach (PrizeModel p in _selectedPrizes)
                 {
                     totalPrize = decimal.Add(totalPrize, p.CalculatePrize(totalFees));
                 }
@@ -247,7 +271,7 @@ namespace TrackerWinFormUI
                 }
             }
 
-            if (selectedTeams.Count < 2)
+            if (_selectedTeams.Count < 2)
             {
                 errorMessage += "A minimum of 2 teams is needed to create a tournament \n";
                 output = false;

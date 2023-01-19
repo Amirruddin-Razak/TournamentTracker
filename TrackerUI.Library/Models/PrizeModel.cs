@@ -48,5 +48,7 @@ namespace TrackerUI.Library.Models
             PrizePercentage = model.PrizePercentage;
             PrizeAmount = model.PrizeAmount;
         }
+
+        public decimal CalculatePrize(decimal totalIncome) => PrizeAmount + (totalIncome * ((decimal)PrizePercentage / 100m));
     }
 }
