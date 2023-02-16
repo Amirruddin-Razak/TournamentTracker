@@ -1,69 +1,83 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Windows.Forms;
-using TrackerLibrary;
-using TrackerLibrary.Models;
+using TrackerUI.Library.Api;
+using TrackerUI.Library.Api.Helper;
+using TrackerUI.Library.Models;
 using TrackerWinFormUI.Interface;
 
-namespace TrackerWinFormUI
+namespace TrackerWinFormUI;
+
+public partial class DashboardForm : Form, ITournamentRequestor
 {
-    public partial class DashboardForm : Form, ITournamentRequestor
+    private BindingList<TournamentModel> _tournaments = new();
+    private readonly IApiConnector _apiConnector;
+    private readonly ITournamentEndpoint _tournamentEndpoint;
+
+    public DashboardForm(IApiConnector apiConnector)
     {
-        private BindingList<TournamentModel> _tournaments = new BindingList<TournamentModel>();
+        InitializeComponent();
 
-        public DashboardForm()
+        _apiConnector = apiConnector;
+        _tournamentEndpoint = new TournamentEndpoint(apiConnector);
+
+        InitializeFormData();
+    }
+
+    private async void InitializeFormData()
+    {
+        try
         {
-            InitializeComponent();
+            var result = await _tournamentEndpoint.GetActiveTournamentAsync();
+            _tournaments = new BindingList<TournamentModel>(result);
 
-            InitializeFormData();
-        }
-
-        private void InitializeFormData()
-        {
-            _tournaments = new BindingList<TournamentModel>(GlobalConfig.connection.GetTournament_All().FindAll(x => x.Active));
             tournamentListBox.DataSource = _tournaments;
             tournamentListBox.DisplayMember = "TournamentName";
         }
-
-        private void CreateTournamentButton_Click(object sender, EventArgs e)
+        catch (Exception)
         {
-            NewTournamentForm frm = new NewTournamentForm(this);
-            frm.Show();
+            MessageBox.Show($"Unexpected error occurs. Please try again later");
+        }
+    }
 
-            WindowState = FormWindowState.Minimized;
-            ShowInTaskbar = false;
+    private void CreateTournamentButton_Click(object sender, EventArgs e)
+    {
+        var frm = new NewTournamentForm(this, _apiConnector);
+        frm.Show();
+
+        WindowState = FormWindowState.Minimized;
+        ShowInTaskbar = false;
+    }
+
+    public void NewTournamentComplete(TournamentModel tournament)
+    {
+        _tournaments.Add(tournament);
+
+        WindowState = FormWindowState.Normal;
+        ShowInTaskbar = true;
+    }
+
+    private void ViewTournamentButton_Click(object sender, EventArgs e)
+    {
+        TournamentModel tournament = (TournamentModel)tournamentListBox?.SelectedItem;
+
+        if (tournament == null)
+        {
+            MessageBox.Show("Please select a tournament to view", "Error");
+            return;
         }
 
-        public void NewTournamentComplete(TournamentModel tournament)
-        {
-            _tournaments.Add(tournament);
+        tournament.OnTournamentComplete += Tournament_OnTournamentComplete;
 
-            WindowState = FormWindowState.Normal;
-            ShowInTaskbar = true;
-        }
+        var frm = new TournamentViewerForm(tournament, this, _apiConnector);
+        frm.Show();
 
-        private void ViewTournamentButton_Click(object sender, EventArgs e)
-        {
-            TournamentModel tournament = (TournamentModel)tournamentListBox?.SelectedItem;
+        WindowState = FormWindowState.Minimized;
+        ShowInTaskbar = false;
+    }
 
-            if (tournament == null)
-            {
-                MessageBox.Show("Please select a tournament to view", "Error");
-                return;
-            }
-
-            tournament.OnTournamentComplete += Tournament_OnTournamentComplete;
-
-            TournamentViewerForm frm = new TournamentViewerForm(tournament, this);
-            frm.Show();
-
-            WindowState = FormWindowState.Minimized;
-            ShowInTaskbar = false;
-        }
-
-        private void Tournament_OnTournamentComplete(object sender, DateTime e)
-        {
-            InitializeFormData();
-        }
+    private void Tournament_OnTournamentComplete(object sender, DateTime e)
+    {
+        InitializeFormData();
     }
 }
