@@ -4,13 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TrackerUI.Library.Models
+namespace TrackerUI.Library.Models;
+
+/// <summary>
+/// Model required to have Id
+/// </summary>
+public interface IDataModel
 {
-    /// <summary>
-    /// Model required to have Id
-    /// </summary>
-    public interface IDataModel
-    {
-        int Id { get; set; }
-    }
+    int Id { get; set; }
 }

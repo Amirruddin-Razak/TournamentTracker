@@ -6,79 +6,78 @@ using TrackerUI.Library.Api.Helper;
 using TrackerUI.Library.Models;
 using TrackerWinFormUI.Interface;
 
-namespace TrackerWinFormUI
+namespace TrackerWinFormUI;
+
+public partial class DashboardForm : Form, ITournamentRequestor
 {
-    public partial class DashboardForm : Form, ITournamentRequestor
+    private BindingList<TournamentModel> _tournaments = new();
+    private readonly IApiConnector _apiConnector;
+    private readonly ITournamentEndpoint _tournamentEndpoint;
+
+    public DashboardForm(IApiConnector apiConnector)
     {
-        private BindingList<TournamentModel> _tournaments = new();
-        private readonly IApiConnector _apiConnector;
-        private readonly ITournamentEndpoint _tournamentEndpoint;
+        InitializeComponent();
 
-        public DashboardForm(IApiConnector apiConnector)
+        _apiConnector = apiConnector;
+        _tournamentEndpoint = new TournamentEndpoint(apiConnector);
+
+        InitializeFormData();
+    }
+
+    private async void InitializeFormData()
+    {
+        try
         {
-            InitializeComponent();
+            var result = await _tournamentEndpoint.GetActiveTournamentAsync();
+            _tournaments = new BindingList<TournamentModel>(result);
 
-            _apiConnector = apiConnector;
-            _tournamentEndpoint = new TournamentEndpoint(apiConnector);
+            tournamentListBox.DataSource = _tournaments;
+            tournamentListBox.DisplayMember = "TournamentName";
+        }
+        catch (Exception)
+        {
+            MessageBox.Show($"Unexpected error occurs. Please try again later");
+        }
+    }
 
-            InitializeFormData();
+    private void CreateTournamentButton_Click(object sender, EventArgs e)
+    {
+        var frm = new NewTournamentForm(this, _apiConnector);
+        frm.Show();
+
+        WindowState = FormWindowState.Minimized;
+        ShowInTaskbar = false;
+    }
+
+    public void NewTournamentComplete(TournamentModel tournament)
+    {
+        _tournaments.Add(tournament);
+
+        WindowState = FormWindowState.Normal;
+        ShowInTaskbar = true;
+    }
+
+    private void ViewTournamentButton_Click(object sender, EventArgs e)
+    {
+        TournamentModel tournament = (TournamentModel)tournamentListBox?.SelectedItem;
+
+        if (tournament == null)
+        {
+            MessageBox.Show("Please select a tournament to view", "Error");
+            return;
         }
 
-        private async void InitializeFormData()
-        {
-            try
-            {
-                var result = await _tournamentEndpoint.GetActiveTournamentAsync();
-                _tournaments = new BindingList<TournamentModel>(result);
+        tournament.OnTournamentComplete += Tournament_OnTournamentComplete;
 
-                tournamentListBox.DataSource = _tournaments;
-                tournamentListBox.DisplayMember = "TournamentName";
-            }
-            catch (Exception)
-            {
-                MessageBox.Show($"Unexpected error occurs. Please try again later");
-            }
-        }
+        var frm = new TournamentViewerForm(tournament, this, _apiConnector);
+        frm.Show();
 
-        private void CreateTournamentButton_Click(object sender, EventArgs e)
-        {
-            var frm = new NewTournamentForm(this, _apiConnector);
-            frm.Show();
+        WindowState = FormWindowState.Minimized;
+        ShowInTaskbar = false;
+    }
 
-            WindowState = FormWindowState.Minimized;
-            ShowInTaskbar = false;
-        }
-
-        public void NewTournamentComplete(TournamentModel tournament)
-        {
-            _tournaments.Add(tournament);
-
-            WindowState = FormWindowState.Normal;
-            ShowInTaskbar = true;
-        }
-
-        private void ViewTournamentButton_Click(object sender, EventArgs e)
-        {
-            TournamentModel tournament = (TournamentModel)tournamentListBox?.SelectedItem;
-
-            if (tournament == null)
-            {
-                MessageBox.Show("Please select a tournament to view", "Error");
-                return;
-            }
-
-            tournament.OnTournamentComplete += Tournament_OnTournamentComplete;
-
-            var frm = new TournamentViewerForm(tournament, this, _apiConnector);
-            frm.Show();
-
-            WindowState = FormWindowState.Minimized;
-            ShowInTaskbar = false;
-        }
-
-        private void Tournament_OnTournamentComplete(object sender, DateTime e)
-        {
-            InitializeFormData();
-        }
+    private void Tournament_OnTournamentComplete(object sender, DateTime e)
+    {
+        InitializeFormData();
     }
 }
