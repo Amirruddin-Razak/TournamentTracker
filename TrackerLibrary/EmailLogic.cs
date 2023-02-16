@@ -16,6 +16,11 @@ namespace TrackerLibrary
 
         public static void SendEmail(List<string> to, List<string> bcc, string subject, string body) 
         {
+            if (to.Count == 0 && bcc.Count == 0)
+            {
+                return;
+            }
+
             MailAddress fromMailAddress = 
                 new MailAddress(GlobalConfig.AppKeyLookup("senderEmail"), GlobalConfig.AppKeyLookup("senderDisplayName"));
 

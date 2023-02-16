@@ -34,7 +34,7 @@ namespace TrackerWinFormUI
                 tournamentListBox.DataSource = _tournaments;
                 tournamentListBox.DisplayMember = "TournamentName";
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 MessageBox.Show($"Unexpected error occurs. Please try again later");
             }

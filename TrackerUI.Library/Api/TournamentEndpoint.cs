@@ -23,9 +23,36 @@ public class TournamentEndpoint : ITournamentEndpoint
         {
             using HttpResponseMessage response = await _apiConnector.ApiClient.GetAsync("Tournament/GetActiveTournament");
 
-            if (response.IsSuccessStatusCode)
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
                 var result = await response.Content.ReadAsAsync<List<TournamentModel>>();
+                return result;
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                return new List<TournamentModel>();
+            }
+            else
+            {
+                throw new Exception(response.ReasonPhrase);
+            }
+        }
+        catch (Exception)
+        {
+            // TODO add log
+            throw;
+        }
+    }
+
+    public async Task<TournamentModel> UpdateTournamentResultAsync(TournamentModel tournament)
+    {
+        try
+        {
+            using HttpResponseMessage response = await _apiConnector.ApiClient.PostAsJsonAsync("Tournament/UpdateTournamentResult", tournament);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadAsAsync<TournamentModel>();
                 return result;
             }
             else
@@ -33,43 +60,30 @@ public class TournamentEndpoint : ITournamentEndpoint
                 throw new Exception(response.ReasonPhrase);
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             // TODO add log
             throw;
         }
     }
 
-    public async Task UpdateTournamentResultAsync(TournamentModel tournament)
-    {
-        try
-        {
-            using HttpResponseMessage response = await _apiConnector.ApiClient.PostAsJsonAsync("Tournament/UpdateTournamentResult", tournament);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                throw new Exception(response.ReasonPhrase);
-            }
-        }
-        catch (Exception ex)
-        {
-            // TODO add log
-            throw;
-        }
-    }
-
-    public async Task CreateTournamentAsync(TournamentModel tournament)
+    public async Task<TournamentModel> CreateTournamentAsync(TournamentModel tournament)
     {
         try
         {
             using HttpResponseMessage response = await _apiConnector.ApiClient.PostAsJsonAsync("Tournament/CreateTournament", tournament);
 
-            if (!response.IsSuccessStatusCode)
+            if (response.StatusCode == System.Net.HttpStatusCode.Created)
+            {
+                var result = await response.Content.ReadAsAsync<TournamentModel>();
+                return result;
+            }
+            else
             {
                 throw new Exception(response.ReasonPhrase);
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             // TODO add log
             throw;

@@ -200,7 +200,7 @@ namespace TrackerWinFormUI
             _selectedTeams.Add(team);
         }
 
-        private void CreateTournamentButton_Click(object sender, EventArgs e)
+        private async void CreateTournamentButton_Click(object sender, EventArgs e)
         {
             if (ValidateTournamemnt() == false)
             {
@@ -217,7 +217,7 @@ namespace TrackerWinFormUI
 
             try
             {
-                _tournamentEndpoint.CreateTournamentAsync(tournament);
+                tournament = await _tournamentEndpoint.CreateTournamentAsync(tournament);
             }
             catch (Exception ex)
             {

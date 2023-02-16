@@ -9,21 +9,31 @@ namespace TrackerAPI.Controllers;
 public class TournamentController : ControllerBase
 {
     [HttpGet]
-    public List<TournamentModel> GetActiveTournament()
+    public IActionResult GetActiveTournament()
     {
         List<TournamentModel> activeTournaments = GlobalConfig.connection.GetTournament_All().FindAll(x => x.Active);
-        return activeTournaments;
+
+        if (activeTournaments.Count > 0)
+        {
+            return Ok(activeTournaments);
+        }
+        else
+        {
+            return NotFound();
+        }
     }
 
     [HttpPost]
-    public void UpdateTournamentResult(TournamentModel tournament)
+    public IActionResult UpdateTournamentResult(TournamentModel tournament)
     {
         TournamentLogic.UpdateTournamentResult(tournament);
+        return Ok(tournament);
     }
 
     [HttpPost]
-    public void CreateTournament(TournamentModel tournament)
+    public IActionResult CreateTournament(TournamentModel tournament)
     {
         TournamentLogic.CreateNewTournament(tournament);
+        return StatusCode(StatusCodes.Status201Created, tournament);
     }
 }

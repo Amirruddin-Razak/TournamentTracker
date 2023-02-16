@@ -11,7 +11,7 @@ public class ApiConnector : IApiConnector
         _apiClient = new HttpClient
         {
             BaseAddress = new Uri(apiUrl),
-            Timeout = TimeSpan.FromSeconds(10)
+            Timeout = TimeSpan.FromSeconds(1000)
         };
 
         _apiClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));

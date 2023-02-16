@@ -24,24 +24,28 @@ public class TeamEndpoint : ITeamEndpoint
         {
             using HttpResponseMessage response = await _apiConnector.ApiClient.GetAsync("Team/GetAllTeam");
 
-            if (response.IsSuccessStatusCode)
+            if (response.StatusCode == HttpStatusCode.OK)
             {
                 var result = await response.Content.ReadAsAsync<List<TeamModel>>();
                 return result;
+            }
+            else if (response.StatusCode == HttpStatusCode.NotFound)
+            {
+                return new List<TeamModel>();
             }
             else
             {
                 throw new Exception(response.ReasonPhrase);
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             // TODO add log
             throw;
         }
     }
 
-    public async Task<int> CreateTeamAsync(TeamModel team)
+    public async Task<TeamModel> CreateTeamAsync(TeamModel team)
     {
         try
         {
@@ -49,15 +53,15 @@ public class TeamEndpoint : ITeamEndpoint
 
             if (response.StatusCode == HttpStatusCode.Created)
             {
-                int createdId = await response.Content.ReadAsAsync<int>();
-                return createdId;
+                var createdTeam = await response.Content.ReadAsAsync<TeamModel>();
+                return createdTeam;
             }
             else
             {
                 throw new Exception(response.ReasonPhrase);
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             // TODO add log
             throw;

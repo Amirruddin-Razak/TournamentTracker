@@ -40,7 +40,7 @@ namespace TrackerWinFormUI
                 memberListBox.DataSource = _selectedMembers;
                 memberListBox.DisplayMember = "FullName";
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 MessageBox.Show("An unexpected error occurs. Please try again later");
                 Close();
@@ -94,7 +94,7 @@ namespace TrackerWinFormUI
 
             try
             {
-                person.Id = await _personEndpoint.CreatePersonAsync(person);
+                person = await _personEndpoint.CreatePersonAsync(person);
 
                 _selectedMembers.Add(person);
 
@@ -179,7 +179,7 @@ namespace TrackerWinFormUI
                 TeamMembers = _selectedMembers.ToList()
             };
 
-           team.Id = await _teamEndpoint.CreateTeamAsync(team);
+           team = await _teamEndpoint.CreateTeamAsync(team);
 
             _callingForm.NewTeamComplete(team);
 

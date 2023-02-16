@@ -18,7 +18,7 @@ public class PersonEndpoint : IPersonEndpoint
         _apiConnector = apiConnector;
     }
 
-    public async Task<int> CreatePersonAsync(PersonModel person)
+    public async Task<PersonModel> CreatePersonAsync(PersonModel person)
     {
         try
         {
@@ -26,15 +26,15 @@ public class PersonEndpoint : IPersonEndpoint
 
             if (response.StatusCode == HttpStatusCode.Created)
             {
-                int createdId = await response.Content.ReadAsAsync<int>();
-                return createdId;
+                var createdPerson = await response.Content.ReadAsAsync<PersonModel>();
+                return createdPerson;
             }
             else
             {
                 throw new Exception(response.ReasonPhrase);
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             // TODO add log
             throw;
@@ -47,17 +47,21 @@ public class PersonEndpoint : IPersonEndpoint
         {
             using HttpResponseMessage response = await _apiConnector.ApiClient.GetAsync("Person/GetAll");
 
-            if (response.IsSuccessStatusCode)
+            if (response.StatusCode == HttpStatusCode.OK)
             {
                 var personList = await response.Content.ReadAsAsync<List<PersonModel>>();
                 return personList;
+            }
+            else if (response.StatusCode == HttpStatusCode.NotFound)
+            {
+                return new List<PersonModel>();
             }
             else
             {
                 throw new Exception(response.ReasonPhrase);
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             // TODO add log
             throw;

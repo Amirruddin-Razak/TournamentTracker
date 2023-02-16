@@ -5,6 +5,6 @@ namespace TrackerUI.Library.Api;
 public interface ITournamentEndpoint
 {
     Task<List<TournamentModel>> GetActiveTournamentAsync();
-    Task UpdateTournamentResultAsync(TournamentModel tournament);
-    Task CreateTournamentAsync(TournamentModel tournament);
+    Task<TournamentModel> UpdateTournamentResultAsync(TournamentModel tournament);
+    Task<TournamentModel> CreateTournamentAsync(TournamentModel tournament);
 }

@@ -12,13 +12,21 @@ public class PersonController : ControllerBase
     public IActionResult CreatePerson(PersonModel person)
     {
         GlobalConfig.connection.SaveNewPerson(person);
-        return StatusCode(StatusCodes.Status201Created, person.Id);
+        return StatusCode(StatusCodes.Status201Created, person);
     }
 
     [HttpGet]
-    public List<PersonModel> GetAll()
+    public IActionResult GetAll()
     {
         var personList = GlobalConfig.connection.GetPerson_All().ToList();
-        return personList;
+        
+        if (personList.Count == 0)
+        {
+            return NotFound();
+        }
+        else
+        {
+            return Ok(personList);
+        }
     }
 }

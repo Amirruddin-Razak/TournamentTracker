@@ -9,16 +9,24 @@ namespace TrackerAPI.Controllers;
 public class TeamController : ControllerBase
 {
     [HttpGet]
-    public List<TeamModel> GetAllTeam()
+    public IActionResult GetAllTeam()
     {
         List<TeamModel> teamList = GlobalConfig.connection.GetTeam_All();
-        return teamList;
+
+        if (teamList.Count == 0)
+        {
+            return NotFound();
+        }
+        else
+        {
+            return Ok(teamList);
+        }
     }
 
     [HttpPost]
     public IActionResult CreateTeam(TeamModel team)
     {
         GlobalConfig.connection.SaveNewTeam(team);
-        return StatusCode(StatusCodes.Status201Created, team.Id);
+        return StatusCode(StatusCodes.Status201Created, team);
     }
 }

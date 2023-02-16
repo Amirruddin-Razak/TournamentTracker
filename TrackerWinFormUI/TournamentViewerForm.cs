@@ -11,7 +11,7 @@ namespace TrackerWinFormUI
 {
     public partial class TournamentViewerForm : Form
     {
-        private readonly TournamentModel _tournament;
+        private TournamentModel _tournament;
         private readonly BindingList<int> _roundNumber = new();
         private readonly BindingList<MatchupModel> _round = new();
         private readonly DashboardForm _caller;
@@ -179,7 +179,7 @@ namespace TrackerWinFormUI
 
             try
             {
-                await _tournamentEndpoint.UpdateTournamentResultAsync(_tournament);
+                _tournament = await _tournamentEndpoint.UpdateTournamentResultAsync(_tournament);
             }
             catch (Exception ex)
             {
