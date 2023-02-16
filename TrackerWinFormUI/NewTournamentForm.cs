@@ -153,7 +153,7 @@ namespace TrackerWinFormUI
 
         private void NewTeamLinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            NewTeamForm frm = new NewTeamForm(this);
+            var frm = new NewTeamForm(this, _apiConnector);
             frm.Show();
         }
 

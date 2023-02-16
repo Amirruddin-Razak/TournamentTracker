@@ -14,4 +14,11 @@ public class TeamController : ControllerBase
         List<TeamModel> teamList = GlobalConfig.connection.GetTeam_All();
         return teamList;
     }
+
+    [HttpPost]
+    public IActionResult CreateTeam(TeamModel team)
+    {
+        GlobalConfig.connection.SaveNewTeam(team);
+        return StatusCode(StatusCodes.Status201Created, team.Id);
+    }
 }

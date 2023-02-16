@@ -9,25 +9,25 @@ using TrackerUI.Library.Models;
 
 namespace TrackerUI.Library.Api;
 
-public class TeamEndpoint : ITeamEndpoint
+public class PersonEndpoint : IPersonEndpoint
 {
     private readonly IApiConnector _apiConnector;
 
-    public TeamEndpoint(IApiConnector apiConnector)
+    public PersonEndpoint(IApiConnector apiConnector)
     {
         _apiConnector = apiConnector;
     }
 
-    public async Task<List<TeamModel>> GetAllTeamAsync()
+    public async Task<int> CreatePersonAsync(PersonModel person)
     {
         try
         {
-            using HttpResponseMessage response = await _apiConnector.ApiClient.GetAsync("Team/GetAllTeam");
+            using HttpResponseMessage response = await _apiConnector.ApiClient.PostAsJsonAsync("Person/CreatePerson", person);
 
-            if (response.IsSuccessStatusCode)
+            if (response.StatusCode == HttpStatusCode.Created)
             {
-                var result = await response.Content.ReadAsAsync<List<TeamModel>>();
-                return result;
+                int createdId = await response.Content.ReadAsAsync<int>();
+                return createdId;
             }
             else
             {
@@ -41,16 +41,16 @@ public class TeamEndpoint : ITeamEndpoint
         }
     }
 
-    public async Task<int> CreateTeamAsync(TeamModel team)
+    public async Task<List<PersonModel>> GetAllPersonAsync()
     {
         try
         {
-            using HttpResponseMessage response = await _apiConnector.ApiClient.PostAsJsonAsync("Team/CreateTeam", team);
+            using HttpResponseMessage response = await _apiConnector.ApiClient.GetAsync("Person/GetAll");
 
-            if (response.StatusCode == HttpStatusCode.Created)
+            if (response.IsSuccessStatusCode)
             {
-                int createdId = await response.Content.ReadAsAsync<int>();
-                return createdId;
+                var personList = await response.Content.ReadAsAsync<List<PersonModel>>();
+                return personList;
             }
             else
             {

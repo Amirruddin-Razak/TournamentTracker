@@ -1,41 +1,50 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using TrackerLibrary;
-using TrackerLibrary.Models;
+using TrackerUI.Library.Api;
+using TrackerUI.Library.Api.Helper;
+using TrackerUI.Library.Models;
 using TrackerWinFormUI.Interface;
 
 namespace TrackerWinFormUI
 {
     public partial class NewTeamForm : Form
     {
-        private ITeamRequestor callingForm;
-        private BindingList<PersonModel> availableMembers = new BindingList<PersonModel>(GlobalConfig.connection.GetPerson_All());
-        private BindingList<PersonModel> selectedMembers = new BindingList<PersonModel>();
+        private readonly ITeamRequestor _callingForm;
+        private readonly ITeamEndpoint _teamEndpoint;
+        private readonly IPersonEndpoint _personEndpoint;
+        private readonly BindingList<PersonModel> _selectedMembers = new();
+        private BindingList<PersonModel> _availableMembers;
 
-        public NewTeamForm(ITeamRequestor caller)
+        public NewTeamForm(ITeamRequestor caller, IApiConnector apiConnector)
         {
             InitializeComponent();
 
-            callingForm = caller;
-
-            InitializeFormData();
+            _callingForm = caller;
+            _teamEndpoint = new TeamEndpoint(apiConnector);
+            _personEndpoint = new PersonEndpoint(apiConnector);
         }
 
-        private void InitializeFormData()
+        private async void NewTeamForm_Load(object sender, EventArgs e)
         {
-            selectMemberComboBox.DataSource = availableMembers;
-            selectMemberComboBox.DisplayMember = "FullName";
+            try
+            {
+                var personList = await _personEndpoint.GetAllPersonAsync();
+                _availableMembers = new BindingList<PersonModel>(personList);
 
-            memberListBox.DataSource = selectedMembers;
-            memberListBox.DisplayMember = "FullName";
+                selectMemberComboBox.DataSource = _availableMembers;
+                selectMemberComboBox.DisplayMember = "FullName";
+
+                memberListBox.DataSource = _selectedMembers;
+                memberListBox.DisplayMember = "FullName";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("An unexpected error occurs. Please try again later");
+                Close();
+            }
         }
 
         private void AddMemberButton_Click(object sender, EventArgs e)
@@ -44,8 +53,8 @@ namespace TrackerWinFormUI
             {
                 PersonModel member = (PersonModel)selectMemberComboBox.SelectedItem;
 
-                selectedMembers.Add(member);
-                availableMembers.Remove(member);
+                _selectedMembers.Add(member);
+                _availableMembers.Remove(member);
             }
             else
             {
@@ -59,8 +68,8 @@ namespace TrackerWinFormUI
             {
                 PersonModel member = (PersonModel)memberListBox.SelectedItem;
 
-                availableMembers.Add(member);
-                selectedMembers.Remove(member);
+                _availableMembers.Add(member);
+                _selectedMembers.Remove(member);
             }
             else
             {
@@ -68,14 +77,14 @@ namespace TrackerWinFormUI
             }
         }
 
-        private void CreateMemberButton_Click(object sender, EventArgs e)
+        private async void CreateMemberButton_Click(object sender, EventArgs e)
         {
             if (ValidateNewMember() == false)
             {
                 return;
             }
 
-            PersonModel person = new PersonModel()
+            PersonModel person = new()
             {
                 FirstName = firstNameTextBox.Text,
                 LastName = lastNameTextBox.Text,
@@ -83,14 +92,21 @@ namespace TrackerWinFormUI
                 PhoneNumber = phoneNumberTextBox.Text
             };
 
-            GlobalConfig.connection.SaveNewPerson(person);
+            try
+            {
+                person.Id = await _personEndpoint.CreatePersonAsync(person);
 
-            selectedMembers.Add(person);
+                _selectedMembers.Add(person);
 
-            firstNameTextBox.Clear();
-            lastNameTextBox.Clear();
-            emailAddressTextBox.Clear();
-            phoneNumberTextBox.Clear();
+                firstNameTextBox.Clear();
+                lastNameTextBox.Clear();
+                emailAddressTextBox.Clear();
+                phoneNumberTextBox.Clear();
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("An unexpected error occurs. Please try again later");
+            }
         }
 
         private bool ValidateNewMember()
@@ -150,21 +166,22 @@ namespace TrackerWinFormUI
             return output;
         }
 
-        private void CreateTeamButton_Click(object sender, EventArgs e)
+        private async void CreateTeamButton_Click(object sender, EventArgs e)
         {
             if (ValidateTeam() == false)
             {
                 return;
             }
 
-            TeamModel team = new TeamModel
+            TeamModel team = new()
             {
                 TeamName = teamNameTextBox.Text,
-                TeamMembers = selectedMembers.ToList()
+                TeamMembers = _selectedMembers.ToList()
             };
 
-            GlobalConfig.connection.SaveNewTeam(team);
-            callingForm.NewTeamComplete(new TrackerUI.Library.Models.TeamModel(team));
+           team.Id = await _teamEndpoint.CreateTeamAsync(team);
+
+            _callingForm.NewTeamComplete(team);
 
             Close();
         }
