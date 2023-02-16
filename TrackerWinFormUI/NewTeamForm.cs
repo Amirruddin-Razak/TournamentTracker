@@ -16,7 +16,7 @@ namespace TrackerWinFormUI
         private readonly ITeamEndpoint _teamEndpoint;
         private readonly IPersonEndpoint _personEndpoint;
         private readonly BindingList<PersonModel> _selectedMembers = new();
-        private BindingList<PersonModel> _availableMembers;
+        private BindingList<PersonModel> _availableMembers = new();
 
         public NewTeamForm(ITeamRequestor caller, IApiConnector apiConnector)
         {

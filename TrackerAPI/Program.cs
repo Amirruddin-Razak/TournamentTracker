@@ -11,7 +11,7 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-GlobalConfig.InitiallizeConnection(DatabaseType.TextFile, app.Configuration);
+GlobalConfig.InitiallizeConnection(DatabaseType.Sql, app.Configuration);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

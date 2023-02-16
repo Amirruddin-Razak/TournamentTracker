@@ -30,6 +30,7 @@ namespace TrackerWinFormUI
             {
                 var result = await _tournamentEndpoint.GetActiveTournamentAsync();
                 _tournaments = new BindingList<TournamentModel>(result);
+
                 tournamentListBox.DataSource = _tournaments;
                 tournamentListBox.DisplayMember = "TournamentName";
             }

@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Forms;
-using TrackerLibrary;
 using TrackerUI.Library.Api;
 using TrackerUI.Library.Api.Helper;
 using TrackerUI.Library.Models;
-using TrackerWinFormUI.Interface;
 
 namespace TrackerWinFormUI
 {

@@ -1,9 +1,7 @@
-﻿using Microsoft.Extensions.Configuration;
-using System;
+﻿using System;
 using System.IO;
-using System.Net.Http;
 using System.Windows.Forms;
-using TrackerLibrary;
+using Microsoft.Extensions.Configuration;
 using TrackerUI.Library.Api.Helper;
 
 namespace TrackerWinFormUI
@@ -20,7 +18,6 @@ namespace TrackerWinFormUI
             Application.SetCompatibleTextRenderingDefault(false);
 
             var config = InitializeConfiguration();
-            GlobalConfig.InitiallizeConnection(DatabaseType.TextFile, config);
 
             IApiConnector apiConnector = new ApiConnector(config.GetSection("appSettings")["ApiUrl"]);
 

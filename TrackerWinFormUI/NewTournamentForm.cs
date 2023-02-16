@@ -1,10 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using TrackerUI.Library.Api;
 using TrackerUI.Library.Api.Helper;
@@ -15,7 +11,7 @@ namespace TrackerWinFormUI
 {
     public partial class NewTournamentForm : Form, ITeamRequestor
     {
-        private BindingList<TeamModel> _availableTeams;
+        private BindingList<TeamModel> _availableTeams = new();
         private readonly BindingList<TeamModel> _selectedTeams = new();
         private readonly BindingList<PrizeModel> _selectedPrizes = new();
         private readonly ITournamentRequestor _callingForm;
@@ -26,10 +22,12 @@ namespace TrackerWinFormUI
         public NewTournamentForm(ITournamentRequestor caller, IApiConnector apiConnector)
         {
             InitializeComponent();
+
             _callingForm = caller;
             _apiConnector = apiConnector;
             _tournamentEndpoint = new TournamentEndpoint(apiConnector);
             _teamEndpoint = new TeamEndpoint(apiConnector);
+
             InitializeFormData();
         }
 

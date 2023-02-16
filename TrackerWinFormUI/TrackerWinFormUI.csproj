@@ -13,7 +13,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TrackerLibrary\TrackerLibrary.csproj" />
     <ProjectReference Include="..\TrackerUI.Library\TrackerUI.Library.csproj" />
   </ItemGroup>
 
